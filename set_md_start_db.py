@@ -29,7 +29,7 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
         txt=f'{name}_{xc}_{mode}_k{"-".join(map(str, kpts))}.txt'
     )
 
-    atoms.set_calculator(calc_par_dict)
+    #atoms.set_calculator(calc_par_dict)
 
     calc_pickle = pickle.dumps(calc_par_dict)
 
