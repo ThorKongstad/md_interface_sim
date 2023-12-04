@@ -45,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('time_step_size', type=float)
     parser.add_argument('XC', type=str)
     parser.add_argument('-k', '--kpts', nargs=3, default=(1, 1, 1), type=int)
-    parser.add_argument('-m', '--mode', choices=('FD', 'LCAO', 'PW'), default='LCAO', type=str)
+    parser.add_argument('-m', '--mode', choices=('fd', 'lcao', 'pw'), default='lcao', type=str)
     args = parser.parse_args()
 
     main(
