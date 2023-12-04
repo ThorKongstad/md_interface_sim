@@ -31,7 +31,7 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
 
     #atoms.set_calculator(calc_par_dict)
 
-    calc_pickle = pickle.dumps(calc_par_dict)
+    calc_pickle = str(pickle.dumps(calc_par_dict))
 
     with db.connect(name + '.db') as db_obj:
         db_obj.write(atoms=atoms, kinitic_E=0, temperature=temperature, brendsen_tau=brendsen_tau, time=0, time_step_size=time_step, data=dict(calc_pickle=calc_pickle))
