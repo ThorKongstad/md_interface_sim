@@ -16,7 +16,7 @@ from ase import units
 
 from sqlite3 import OperationalError
 
-#from gpaw import GPAW, FermiDirac, PoissonSolver, Mixer
+from gpaw import GPAW#, FermiDirac, PoissonSolver, Mixer
 #from gpaw.utilities import h2gpts
 
 @dataclass
@@ -43,7 +43,7 @@ def main(md_db: str, n_steps):
         row = db_obj.get(selection=f'id=-1')
         atoms: Atoms = row.toatoms()
         calc_pickle = row.data.get('calc_pickle')
-        atoms.set_calculator(pickle.load(calc_pickle))
+        atoms.set_calculator(GPAW(**pickle.load(calc_pickle)))
 
         #start_time = row.get('time')
         time_step = row.get('time_step_size')

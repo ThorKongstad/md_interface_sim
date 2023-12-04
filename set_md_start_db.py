@@ -4,7 +4,7 @@ import pickle
 from ase.io import read
 import ase.db as db
 
-from gpaw import GPAW, FermiDirac, PoissonSolver, Mixer
+from gpaw import FermiDirac, PoissonSolver, Mixer
 from gpaw.utilities import h2gpts
 
 
@@ -13,7 +13,7 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
 
     name = structure.split('/')[-1].split('.')[0]
 
-    calc = GPAW(
+    calc_par_dict = dict(
         mode=mode,
         basis='dzp',
         #setups={'Pt': '10'},
@@ -29,9 +29,9 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
         txt=f'{name}_{xc}_{mode}_k{"-".join(map(str, kpts))}.txt'
     )
 
-    atoms.set_calculator(calc)
+    atoms.set_calculator(calc_par_dict)
 
-    calc_pickle = pickle.dumps(calc)
+    calc_pickle = pickle.dumps(calc_par_dict)
 
     with db.connect(name + '.db') as db_obj:
         db_obj.write(atoms=atoms, kinitic_E=0, temperature=temperature, brendsen_tau=brendsen_tau, time=0, time_step_size=time_step, data=dict(calc_pickle=calc_pickle))
