@@ -27,14 +27,14 @@ class iteration_counter:
         return self.i + other
 
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(5), wait=wait_random(min=60, max=600)) # will retry randomly within 10 min
-def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_size: float, calc_pickle: Optional[bytes] = None,):
+def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_size: float, calc_par_pickle: Optional[bytes] = None,):
     mean_elec_pot_z = atoms.calc.get_electrostatic_potential().mean(1).mean(0)
     fermi_E = atoms.calc.get_fermi_level()
     work_function_top = mean_elec_pot_z[-1 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.mode.get('name')).lower() == 'pw' else -3] - fermi_E
     work_function_bot = mean_elec_pot_z[0 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.mode.get('name')).lower() == 'pw' else 2] - fermi_E
     with db.connect(database_dir) as db_obj:
         cur_time = db_obj.get(selection='id=-1').get('time') + time_step_size
-        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(calc_pickle if calc_pickle else pickle.dumps(atoms.calc))))
+        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(calc_par_pickle if calc_par_pickle else pickle.dumps(atoms.calc.parameters))))
 
 
 def main(md_db: str, n_steps):
@@ -42,8 +42,8 @@ def main(md_db: str, n_steps):
     with db.connect(md_db) as db_obj:
         row = db_obj.get(selection=f'-1')
         atoms: Atoms = row.toatoms()
-        calc_pickle = row.data.get('calc_pickle')
-        atoms.set_calculator(GPAW(**pickle.loads(eval(calc_pickle))))
+        calc_pickle = eval(row.data.get('calc_pickle'))
+        atoms.set_calculator(GPAW(**pickle.loads(calc_pickle)))
 
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
