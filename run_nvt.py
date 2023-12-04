@@ -48,7 +48,7 @@ def main(md_db: str, n_steps):
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
 
-        free_atoms = len(atoms) - sum([len(con.indices) for con in atoms.constraints]) # this will only work in newer version of ase and older fixatoms in older version, since indicies are called a in some places
+        free_atoms = len(atoms) - sum([len(con.index) for con in atoms.constraints]) # this will only work in newer version of ase and older fixatoms in older version, since indicies are called a in some places
 
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
