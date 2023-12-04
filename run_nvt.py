@@ -37,7 +37,7 @@ def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_s
         db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(calc_par_pickle if calc_par_pickle else pickle.dumps(atoms.calc.parameters))))
 
 
-def main(md_db: str, n_steps):
+def main(md_db: str, n_steps: int):
     if not os.path.basename(md_db) in os.listdir(db_path if len(db_path := os.path.dirname(md_db)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(md_db) as db_obj:
         row = db_obj.get(selection=f'-1')
@@ -67,8 +67,8 @@ def main(md_db: str, n_steps):
 
 if __name__ =='__main__':
     parser =argparse.ArgumentParser()
-    parser.add_argument('db_structure')
-    parser.add_argument('calc_n_steps')
+    parser.add_argument('db_structure', type=str)
+    parser.add_argument('calc_n_steps', type=int)
     args = parser.parse_args()
 
 
