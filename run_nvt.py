@@ -40,10 +40,10 @@ def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_s
 def main(md_db: str, n_steps):
     if not os.path.basename(md_db) in os.listdir(db_path if len(db_path := os.path.dirname(md_db)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(md_db) as db_obj:
-        row = db_obj.get(selection=f'id=-1')
+        row = db_obj.get(selection=f'-1')
         atoms: Atoms = row.toatoms()
         calc_pickle = row.data.get('calc_pickle')
-        atoms.set_calculator(GPAW(**pickle.load(calc_pickle)))
+        atoms.set_calculator(GPAW(**pickle.loads(eval(calc_pickle))))
 
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
