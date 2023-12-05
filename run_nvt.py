@@ -33,14 +33,14 @@ def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_s
     work_function_top = mean_elec_pot_z[-5] - fermi_E # [-1 if not (atoms.calc.parameters.get('mode') if isinstance(atoms.calc.parameters.get('mode'), str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else -3] - fermi_E
     work_function_bot = mean_elec_pot_z[4] - fermi_E #[0 if not (atoms.calc.parameters.get('mode') if isinstance(atoms.calc.parameters.get('mode'), str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else 2] - fermi_E
     with db.connect(database_dir) as db_obj:
-        cur_time = db_obj.get(selection='-1').get('time') + time_step_size
+        cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time') + time_step_size
         db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(str(calc_par_pickle) if calc_par_pickle else str(pickle.dumps(atoms.calc.parameters)))))
 
 
 def main(md_db: str, n_steps: int):
     if not os.path.basename(md_db) in os.listdir(db_path if len(db_path := os.path.dirname(md_db)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(md_db) as db_obj:
-        row = db_obj.get(selection=f'-1')
+        row = db_obj.get(selection=f'id={len(db_obj)}')
         atoms: Atoms = row.toatoms()
         calc_pickle = eval(row.data.get('calc_pickle'))
         atoms.set_calculator(GPAW(**pickle.loads(calc_pickle)))
