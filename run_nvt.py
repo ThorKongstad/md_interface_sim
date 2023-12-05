@@ -59,7 +59,7 @@ def main(md_db: str, n_steps: int):
                database_dir=md_db,
                temperature=temperature,
                time_step_size=time_step,
-               calc_pickle=calc_pickle,
+               calc_par_pickle=calc_pickle,
                )
 
     dyn.run(n_steps)
