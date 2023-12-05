@@ -30,8 +30,8 @@ class iteration_counter:
 def db_observer(atoms: Atoms, database_dir: str, temperature: float, time_step_size: float, calc_par_pickle: Optional[bytes] = None,):
     mean_elec_pot_z = atoms.calc.get_electrostatic_potential().mean(1).mean(0)
     fermi_E = atoms.calc.get_fermi_level()
-    work_function_top = mean_elec_pot_z[-1 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.mode.get('name')).lower() == 'pw' else -3] - fermi_E
-    work_function_bot = mean_elec_pot_z[0 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.mode.get('name')).lower() == 'pw' else 2] - fermi_E
+    work_function_top = mean_elec_pot_z[-1 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else -3] - fermi_E
+    work_function_bot = mean_elec_pot_z[0 if not (atoms.calc.mode if isinstance(atoms.calc.mode, str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else 2] - fermi_E
     with db.connect(database_dir) as db_obj:
         cur_time = db_obj.get(selection='id=-1').get('time') + time_step_size
         db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(calc_par_pickle if calc_par_pickle else pickle.dumps(atoms.calc.parameters))))
