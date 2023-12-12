@@ -37,7 +37,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
 
     fig.update_layout(
         showlegend=False,
-        xaxis_title=r'\Phi',
+        xaxis_title=r'$\Phi$',
         yaxis_title='Image count',
     )
 
