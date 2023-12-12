@@ -9,17 +9,30 @@ from subprocess import call
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import build_pd, folder_exist
 
+import numpy as np
+from scipy.stats import norm
+from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 
 
-def plot_bins_work_func(panda_data, save_name: str):
+def plot_bins_work_func(panda_data: DataFrame, save_name: str):
     binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
-    fig = go.Figure()
 
+    mu_fit, sd_fit = norm.fit(panda_data['work_top'])
+
+    fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=panda_data['work_top'],
         xbins=dict(size=binsize)
+    ))
+
+    line = np.linspace(panda_data['work_top'].min, panda_data['work_top'].max, 1000)
+
+    fig.add_trace(go.Scatter(
+        x=line,
+        y=map(lambda x: 1/(sd_fit*np.sqrt(2*np.pi))*np.exp(-0.5*((x-mu_fit)/sd_fit)**2), line),
+        name=f'norm: mu={mu_fit:.2f}, sd={sd_fit:.2f}'
     ))
 
     fig.update_layout(
