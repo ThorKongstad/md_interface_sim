@@ -24,13 +24,12 @@ def plot_bins_work_func(panda_data, save_name: str):
 
     fig.update_layout(
         showlegend=False,
-        xaxis_title='\Phi',
+        xaxis_title=r'\Phi',
         yaxis_title='Image count',
     )
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
-
 
 
 def main(md_db: str):
@@ -41,8 +40,9 @@ def main(md_db: str):
     plot_bins_work_func(md_pd, plot_name)
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('db', type=str)
     args = parser.parse_args()
+
+    main(args.db)
