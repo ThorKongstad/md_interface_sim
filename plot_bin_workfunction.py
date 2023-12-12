@@ -27,11 +27,11 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
         xbins=dict(size=binsize)
     ))
 
-    line = np.linspace(panda_data['work_top'].min, panda_data['work_top'].max, 1000)
+    line = np.linspace(panda_data['work_top'].min(), panda_data['work_top'].max(), 1000)
 
     fig.add_trace(go.Scatter(
         x=line,
-        y=map(lambda x: 1/(sd_fit*np.sqrt(2*np.pi))*np.exp(-0.5*((x-mu_fit)/sd_fit)**2), line),
+        y=tuple(map(lambda x: 1/(sd_fit*np.sqrt(2*np.pi))*np.exp(-0.5*((x-mu_fit)/sd_fit)**2), line)),
         name=f'norm: mu={mu_fit:.2f}, sd={sd_fit:.2f}'
     ))
 
