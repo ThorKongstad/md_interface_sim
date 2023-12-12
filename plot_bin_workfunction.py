@@ -19,7 +19,7 @@ import plotly.graph_objects as go
 def plot_bins_work_func(panda_data: DataFrame, save_name: str):
     binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
 
-    mu_fit, sd_fit = norm.fit(panda_data['work_top'])
+    mu_fit, sd_fit = norm.fit(panda_data['work_top'].dropna())
 
     fig = go.Figure()
     fig.add_trace(go.Histogram(
