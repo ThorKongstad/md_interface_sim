@@ -47,7 +47,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
 
 
 def main(md_db: str):
-    md_pd = build_pd(md_db)
+    md_pd = build_pd(md_db, select_key='time>0')
 
     plot_name = os.path.basename(md_db).replace('.db', '') + '_bin_plot'
 
