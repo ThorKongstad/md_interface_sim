@@ -53,9 +53,9 @@ def db_observer(atoms: Atoms, database_dir: str, temperature: float, brendsen_ta
 
 def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
     if world.rank == 0:
-        fermi_E = atoms.get_calculator.get_fermi_level()
+        fermi_E = atoms.get_calculator().get_fermi_level()
 
-        mean_elec_pot_z = atoms.get_calculator.get_electrostatic_potential().mean(1).mean(0) - fermi_E
+        mean_elec_pot_z = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0) - fermi_E
         z_axis = np.linspace(0, atoms.cell[2, 2], len(mean_elec_pot_z), endpoint=False)
 
         fig = px.line(
