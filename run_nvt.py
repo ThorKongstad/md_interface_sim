@@ -54,23 +54,23 @@ def db_observer(atoms: Atoms, database_dir: str, temperature: float, brendsen_ta
 
 
 def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
-    if world.rank == 0:
-        fermi_E = atoms.get_calculator().get_fermi_level()
+#    if world.rank == 0:
+    fermi_E = atoms.get_calculator().get_fermi_level()
 
-        mean_elec_pot_z = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0) - fermi_E
-        z_axis = np.linspace(0, atoms.cell[2, 2], len(mean_elec_pot_z), endpoint=False)
+    mean_elec_pot_z = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0) - fermi_E
+    z_axis = np.linspace(0, atoms.cell[2, 2], len(mean_elec_pot_z), endpoint=False)
 
-        fig = px.line(
-            x=z_axis,
-            y=mean_elec_pot_z,
-        )
+    fig = px.line(
+        x=z_axis,
+        y=mean_elec_pot_z,
+    )
 
-        fig.update_layout(xaxis_title='Z', yaxis_title='work function')
+    fig.update_layout(xaxis_title='Z', yaxis_title='work function')
 
-        folder_exist(f'workfunc_plots_{calculation_name}')
-        save_name = f'workfunc_plots_{calculation_name}/time_{time_step}'
-        fig.write_html(save_name + '.html', include_mathjax='cdn')
-    barrier()
+    folder_exist(f'workfunc_plots_{calculation_name}')
+    save_name = f'workfunc_plots_{calculation_name}/time_{time_step}'
+    fig.write_html(save_name + '.html', include_mathjax='cdn')
+#    barrier()
 
 
 def main(md_db: str, n_steps: int):
@@ -100,8 +100,6 @@ def main(md_db: str, n_steps: int):
                time_step_size=time_step,
                calc_par_pickle=calc_pickle,
                )
-
-    dyn.attach(lambda: print('went to observer nr 2'))
 
     dyn.attach(plot_work_functions,
                interval=500,
