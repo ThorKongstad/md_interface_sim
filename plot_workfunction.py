@@ -13,6 +13,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ra
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import folder_exist
+from md_interface_sim.run_nvt import plot_work_functions
 
 import numpy as np
 
@@ -29,28 +30,6 @@ from gpaw import GPAW#, FermiDirac, PoissonSolver, Mixer
 
 import plotly.graph_objects as go
 import plotly.express as px
-
-
-
-def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
-#    if world.rank == 0:
-    fermi_E = atoms.get_calculator().get_fermi_level()
-
-#    mean_elec_pot_z = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0) - fermi_E
-    mean_elec_pot_z = tuple(map(lambda pot: pot - fermi_E,  atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)))
-    z_axis = np.linspace(0, atoms.cell[2, 2], len(mean_elec_pot_z), endpoint=False)
-
-    fig = px.line(
-        x=z_axis,
-        y=mean_elec_pot_z,
-    )
-
-    fig.update_layout(xaxis_title='Z', yaxis_title='work function')
-
-    folder_exist(f'workfunc_plots_{calculation_name}')
-    save_name = f'workfunc_plots_{calculation_name}/time_{time_step}'
-    fig.write_html(save_name + '.html', include_mathjax='cdn')
-#    barrier()
 
 
 def main(db_dir: str, index: int):
@@ -72,19 +51,20 @@ def main(db_dir: str, index: int):
         brendsen_tau = row.get('brendsen_tau')
 
     atoms.get_potential_energy()
-    fermi_E = atoms.get_calculator().get_fermi_level()
-    el_pot = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)
 
-    parprint(f'the potential object have type: {type(el_pot)}')
-    parprint(f'the fermi lvl is {atoms.get_calculator().get_fermi_level()}')
-    parprint()
-    parprint('printing work function twice')
-    parprint()
-    parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
-    parprint()
-    parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
+    plot_work_functions(atoms, os.path.basename(db_dir).split('.')[0], cur_time)
 
+    #fermi_E = atoms.get_calculator().get_fermi_level()
+    #el_pot = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)
 
+    #parprint(f'the potential object have type: {type(el_pot)}')
+    #parprint(f'the fermi lvl is {atoms.get_calculator().get_fermi_level()}')
+    #parprint()
+    #parprint('printing work function twice')
+    #parprint()
+    #parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
+    #parprint()
+    #parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
 
 
 if __name__ == '__main__':
