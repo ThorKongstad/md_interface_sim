@@ -71,6 +71,8 @@ def main(db_dir: str, index: int):
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
 
+    atoms.get_potential_energy()
+    fermi_E = atoms.get_calculator().get_fermi_level()
     el_pot = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)
 
     print(f'the potential object have type: {type(el_pot)}')
