@@ -54,17 +54,17 @@ def main(db_dir: str, index: int):
 
     plot_work_functions(atoms, os.path.basename(db_dir).split('.')[0], cur_time)
 
-    #fermi_E = atoms.get_calculator().get_fermi_level()
-    #el_pot = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)
+    #fermi_E = atoms.calc.get_fermi_level()
+    #el_pot = atoms.calc.get_electrostatic_potential().mean(1).mean(0)
 
     #parprint(f'the potential object have type: {type(el_pot)}')
-    #parprint(f'the fermi lvl is {atoms.get_calculator().get_fermi_level()}')
+    #parprint(f'the fermi lvl is {atoms.calc.get_fermi_level()}')
     #parprint()
     #parprint('printing work function twice')
     #parprint()
-    #parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
+    #parprint(atoms.calc.get_electrostatic_potential().mean(1).mean(0))
     #parprint()
-    #parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
+    #parprint(atoms.calc.get_electrostatic_potential().mean(1).mean(0))
 
 
 if __name__ == '__main__':
