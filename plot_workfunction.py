@@ -1,3 +1,7 @@
+#partition=katla
+#nprocshared=32
+#mem=2000MB
+#constrain='[v4|v5]'
 import argparse
 import pickle
 import os
