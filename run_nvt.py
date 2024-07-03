@@ -85,7 +85,7 @@ def main(md_db: str, n_steps: int):
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
         global cur_time
-        cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time') + time_step
+        cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time')
 
         free_atoms = len(atoms) - sum([len(con.index) for con in atoms.constraints]) # this will only work in newer version of ase and older fixatoms in older version, since indicies are called a in some places
 
