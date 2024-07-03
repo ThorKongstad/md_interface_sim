@@ -20,7 +20,7 @@ import ase.db as db
 from ase import Atoms
 from ase.md.nvtberendsen import NVTBerendsen
 from ase import units
-from ase.parallel import world, barrier
+from ase.parallel import world, barrier, parprint
 
 from sqlite3 import OperationalError
 
@@ -75,14 +75,14 @@ def main(db_dir: str, index: int):
     fermi_E = atoms.get_calculator().get_fermi_level()
     el_pot = atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0)
 
-    print(f'the potential object have type: {type(el_pot)}')
-    print(f'the fermi lvl is {atoms.get_calculator().get_fermi_level()}')
-    print()
-    print('printing work function twice')
-    print()
-    print(atoms.get_calculator().get_electrostatic_potential.mean(1).mean(0))
-    print()
-    print(atoms.get_calculator().get_electrostatic_potential.mean(1).mean(0))
+    parprint(f'the potential object have type: {type(el_pot)}')
+    parprint(f'the fermi lvl is {atoms.get_calculator().get_fermi_level()}')
+    parprint()
+    parprint('printing work function twice')
+    parprint()
+    parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
+    parprint()
+    parprint(atoms.get_calculator().get_electrostatic_potential().mean(1).mean(0))
 
 
 
