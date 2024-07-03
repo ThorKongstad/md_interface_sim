@@ -35,7 +35,7 @@ import plotly.express as px
 def main(db_dir: str, index: int):
     if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(db_dir) as db_obj:
-        row = db_obj.get(selection=f'id={len(db_obj)}')
+        row = db_obj.get(selection=f'id={index}')
         atoms: Atoms = row.toatoms()
         calc_pickle = eval(row.data.get('calc_pickle'))
         atoms.set_calculator(GPAW(**pickle.loads(calc_pickle)))
@@ -43,7 +43,7 @@ def main(db_dir: str, index: int):
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
         global cur_time
-        cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time') + time_step
+        cur_time = db_obj.get(selection=f'id={index}').get('time')
 
         free_atoms = len(atoms) - sum([len(con.index) for con in atoms.constraints]) # this will only work in newer version of ase and older fixatoms in older version, since indicies are called a in some places
 
