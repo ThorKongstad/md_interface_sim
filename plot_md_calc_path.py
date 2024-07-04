@@ -41,8 +41,8 @@ def main(db_dir: str):
 
     fig.update_layout(xaxis_title='Z', yaxis_title='work function')
 
-#    folder_exist(f'workfunc_plots_{calculation_name}')
-    save_name = os.path.basename(db_dir).split('.')[0] + '_path' #f'workfunc_plots_{calculation_name}/time_{time_step}'
+    folder_exist(f'misc_plots')
+    save_name = f'misc_plots/' + os.path.basename(db_dir).split('.')[0] + '_path' #f'workfunc_plots_{calculation_name}/time_{time_step}'
     fig.write_html(save_name + '.html', include_mathjax='cdn')
 
 
