@@ -40,6 +40,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
         showlegend=False,
         xaxis_title=r'$\Phi$',
         yaxis_title='Image count',
+        title=f'Count: {len(panda_data.index)}'
     )
 
     folder_exist('plots')
