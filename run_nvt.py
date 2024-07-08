@@ -87,9 +87,10 @@ def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
     barrier()
 
 
-def main(md_db: str, n_steps: int):
+def main(md_db: str, n_steps: int, run_until: bool = False):
     if not os.path.basename(md_db) in os.listdir(db_path if len(db_path := os.path.dirname(md_db)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(md_db) as db_obj:
+        db_size = len(db_obj)
         row = db_obj.get(selection=f'id={len(db_obj)}')
         atoms: Atoms = row.toatoms()
         calc_pickle = eval(row.data.get('calc_pickle'))
@@ -122,13 +123,14 @@ def main(md_db: str, n_steps: int):
                time_step=cur_time
                )
 
-    dyn.run(n_steps)
+    dyn.run(n_steps if not run_until else n_steps - db_size)
 
 
 if __name__ =='__main__':
     parser =argparse.ArgumentParser()
     parser.add_argument('db_structure', type=str)
     parser.add_argument('calc_n_steps', type=int)
+    parser.add_argument('--until', action='store_true', default=False)
     args = parser.parse_args()
 
 
