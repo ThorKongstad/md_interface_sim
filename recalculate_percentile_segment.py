@@ -34,15 +34,25 @@ from gpaw.utilities import h2gpts
 #import plotly.graph_objects as go
 
 
-def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[int, int, int] = (1, 1, 1),):
+def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[int, int, int] = (1, 1, 1), from_amanda: bool = False):
     if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
-    with db.connect(db_dir) as db_obj:
-        row = db_obj.get(selection=f'id={row_index}')
-        atoms: Atoms = row.toatoms()
-        global cur_time
-        cur_time = row.get('time')
-        temperature = row.get('temperature')
-        brendsen_tau = row.get('brendsen_tau')
+    if from_amanda:
+        with db.connect(db_dir) as db_obj:
+            row = db_obj.get(selection=f'id={row_index}')
+            atoms: Atoms = row.toatoms()
+            global cur_time
+            cur_time = row.get('Step')
+            temperature = row.get('Temperature')
+            brendsen_tau = 200 #row.get('brendsen_tau')
+
+    else:
+        with db.connect(db_dir) as db_obj:
+            row = db_obj.get(selection=f'id={row_index}')
+            atoms: Atoms = row.toatoms()
+            global cur_time
+            cur_time = row.get('time')
+            temperature = row.get('temperature')
+            brendsen_tau = row.get('brendsen_tau')
 
     name = f'{atoms.symbols}_recalculate_{xc}_{mode}' + (f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')
 
@@ -75,7 +85,7 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
     del atoms,
 
 
-def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpts: tuple[int, int, int] = (1, 1, 1),):
+def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpts: tuple[int, int, int] = (1, 1, 1), from_amanda: bool = False):
     if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
 
     md_panda: pd.DataFrame = build_pd(db_dir)
@@ -97,6 +107,7 @@ if __name__ == '__main__':
     parser.add_argument('-XC', '--XC', type=str, default='RPBE')
     parser.add_argument('-k', '--kpts', nargs=3, default=(1, 1, 1), type=int)
     parser.add_argument('-m', '--mode', choices=('fd', 'lcao', 'pw'), default='lcao', type=str)
+    parser.add_argument('--from_amanda', action='store_true', default=False)
     args = parser.parse_args()
 
     main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.xc, kpts=args.kpts, mode=args.mode)
