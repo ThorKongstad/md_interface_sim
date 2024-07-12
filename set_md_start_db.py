@@ -13,12 +13,13 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
 
     name = structure.split('/')[-1].split('.')[0]
 
+    kpts_dict = dict(kpts=kpts) if mode == 'pw' else dict()
+
     calc_par_dict = dict(
         mode=mode,
         basis='dzp',
         #setups={'Pt': '10'},
         xc=xc,
-        kpts=kpts,
         occupations=FermiDirac(0.1),
         poissonsolver={'dipolelayer': 'xy'},
         mixer=Mixer(beta=0.025, nmaxold=5, weight=50.0),
@@ -26,14 +27,15 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
         #    convergence={'energy': 2.0e-7, 'density': 1e-5}, # HIGH
         convergence={'energy': 5.0e-6, 'density': 8e-5},  # LOW
         #    parallel = dict(sl_auto = True), #Using Scalapack = 4x speedup!
-        txt=f'{name}_{xc}_{mode}_k{"-".join(map(str, kpts))}.txt'
+        txt=f'{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')+'.txt',
+        **kpts_dict
     )
 
     #atoms.set_calculator(calc_par_dict)
 
     calc_pickle = str(pickle.dumps(calc_par_dict))
 
-    with db.connect(f'{name}_{xc}_{mode}_k{"-".join(map(str, kpts))}' + '.db') as db_obj:
+    with db.connect(f'{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '') + '.db') as db_obj:
         db_obj.write(atoms=atoms, kinitic_E=0, temperature=temperature, brendsen_tau=brendsen_tau, time=0, time_step_size=time_step, data=dict(calc_pickle=calc_pickle))
 
 
