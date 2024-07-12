@@ -46,12 +46,14 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
 
     name = f'{atoms.symbols}_recalculate_{xc}_{mode}' + (f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')
 
+    kpts_dict = dict(kpts=kpts) if mode == 'pw' else dict()
+
     calc_par_dict = dict(
         mode=mode,
         basis='dzp',
         # setups={'Pt': '10'},
         xc=xc,
-        kpts=kpts,
+        #kpts=kpts,
         occupations=FermiDirac(0.1),
         poissonsolver={'dipolelayer': 'xy'},
         mixer=Mixer(beta=0.025, nmaxold=5, weight=50.0),
@@ -59,7 +61,8 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
         #    convergence={'energy': 2.0e-7, 'density': 1e-5}, # HIGH
         convergence={'energy': 5.0e-6, 'density': 8e-5},  # LOW
         #    parallel = dict(sl_auto = True), #Using Scalapack = 4x speedup!
-        txt=f'{name}.txt'
+        txt=f'{name}.txt',
+        **kpts_dict
     )
     calc_pickle = str(pickle.dumps(calc_par_dict))
 
