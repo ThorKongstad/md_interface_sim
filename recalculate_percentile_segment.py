@@ -96,7 +96,7 @@ def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpt
     pd_cutout = pd.concat([md_panda.query('work_top == @work_percen').head(1) for work_percen in percen_list])
 
     for row in pd_cutout.itertuples()[start_from:]:
-        single_point(db_dir, getattr(row, 'id'),  mode, xc, kpts,)
+        single_point(db_dir, getattr(row, 'id'),  mode, xc, kpts, from_amanda=from_amanda)
 
 
 if __name__ == '__main__':
@@ -110,4 +110,4 @@ if __name__ == '__main__':
     parser.add_argument('--from_amanda', action='store_true', default=False)
     args = parser.parse_args()
 
-    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.xc, kpts=args.kpts, mode=args.mode)
+    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.xc, kpts=args.kpts, mode=args.mode, from_amanda=args.from_amanda)
