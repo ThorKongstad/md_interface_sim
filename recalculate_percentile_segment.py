@@ -110,4 +110,4 @@ if __name__ == '__main__':
     parser.add_argument('--from_amanda', action='store_true')
     args = parser.parse_args()
 
-    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.xc, kpts=args.kpts, mode=args.mode, from_amanda=args.from_amanda)
+    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.XC, kpts=args.kpts, mode=args.mode, from_amanda=args.from_amanda)
