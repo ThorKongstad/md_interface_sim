@@ -90,10 +90,10 @@ def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpt
 
     md_panda: pd.DataFrame = build_pd(db_dir)
 
-    percentiles: pd.DataFrame = md_panda['wftop' if from_anmanda else 'work_top'].quantile(np.linspace(1, 99, nr_segments), interpolation='nearest')
-    percen_list = percentiles['wftop' if from_anmanda else 'work_top'].to_list
+    percentiles: pd.DataFrame = md_panda['wftop' if from_amanda else 'work_top'].quantile(np.linspace(1, 99, nr_segments), interpolation='nearest')
+    percen_list = percentiles['wftop' if from_amanda else 'work_top'].to_list
 
-    pd_cutout = pd.concat([md_panda.query(f'{"wftop" if from_anmanda else "work_top"} == @work_percen').head(1) for work_percen in percen_list])
+    pd_cutout = pd.concat([md_panda.query(f'{"wftop" if from_amanda else "work_top"} == @work_percen').head(1) for work_percen in percen_list])
 
     for row in pd_cutout.itertuples()[start_from:]:
         single_point(db_dir, getattr(row, 'id'),  mode, xc, kpts, from_amanda=from_amanda)
