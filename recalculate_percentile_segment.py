@@ -54,7 +54,7 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
             temperature = row.get('temperature')
             brendsen_tau = row.get('brendsen_tau')
 
-    name = f'{atoms.symbols}_recalculate_{xc}_{mode}' + (f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')
+    name = f'{os.path.basename(db_dir).split(".")[0]}_recalculate_{xc}_{mode}' + (f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')
 
     kpts_dict = dict(kpts=kpts) if mode == 'pw' else dict()
 
