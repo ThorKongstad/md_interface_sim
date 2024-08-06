@@ -85,17 +85,17 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
     del atoms,
 
 
-def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpts: tuple[int, int, int] = (1, 1, 1), from_amanda: bool = False):
+def main(db_dir: str, nr_segments: int, mode: str, xc: str, start_from: int = 0, end_at: Optional[int] = None, kpts: tuple[int, int, int] = (1, 1, 1), from_amanda: bool = False):
     if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
 
     md_panda: pd.DataFrame = build_pd(db_dir)
 
     percentiles: pd.DataFrame = md_panda['wftop' if from_amanda else 'work_top'].quantile(np.linspace(0.1, 0.99, nr_segments), interpolation='nearest')
-    percen_list = percentiles['wftop' if from_amanda else 'work_top'].to_list
+    percen_list = percentiles.to_list()
 
     pd_cutout = pd.concat([md_panda.query(f'{"wftop" if from_amanda else "work_top"} == @work_percen').head(1) for work_percen in percen_list])
 
-    for row in pd_cutout.itertuples()[start_from:]:
+    for row in pd_cutout.itertuples()[start_from:end_at]:
         single_point(db_dir, getattr(row, 'id'),  mode, xc, kpts, from_amanda=from_amanda)
 
 
@@ -104,10 +104,11 @@ if __name__ == '__main__':
     parser.add_argument('db', type=str)
     parser.add_argument('nr_segments', type=int)
     parser.add_argument('-from', '--start_from', type=int, default=0)
+    parser.add_argument('-to', '--end_at', type=int, default=None)
     parser.add_argument('-XC', '--XC', type=str, default='RPBE')
     parser.add_argument('-k', '--kpts', nargs=3, default=(1, 1, 1), type=int)
     parser.add_argument('-m', '--mode', choices=('fd', 'lcao', 'pw'), default='lcao', type=str)
     parser.add_argument('--from_amanda', action='store_true')
     args = parser.parse_args()
 
-    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, xc=args.XC, kpts=args.kpts, mode=args.mode, from_amanda=args.from_amanda)
+    main(db_dir=args.db, nr_segments=args.nr_segments, start_from=args.start_from, end_at=args.end_at, xc=args.XC, kpts=args.kpts, mode=args.mode, from_amanda=args.from_amanda)
