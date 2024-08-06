@@ -40,8 +40,9 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
         with db.connect(db_dir) as db_obj:
             row = db_obj.get(selection=f'id={row_index}')
             atoms: Atoms = row.toatoms()
-            if 'cur_time' not in globals(): global cur_time
-            globals()['cur_time'] = row.get('Step')
+            #if 'cur_time' not in globals(): global cur_time
+            #globals()['cur_time'] = row.get('Step')
+            cur_time = row.get('Step')
             temperature = row.get('Temperature')
             brendsen_tau = 200 #row.get('brendsen_tau')
 
@@ -49,8 +50,9 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
         with db.connect(db_dir) as db_obj:
             row = db_obj.get(selection=f'id={row_index}')
             atoms: Atoms = row.toatoms()
-            if 'cur_time' not in globals(): global cur_time
-            globals()['cur_time'] = row.get('time')
+            #if 'cur_time' not in globals(): global cur_time
+            #globals()['cur_time'] = row.get('time')
+            cur_time = row.get('time')
             temperature = row.get('temperature')
             brendsen_tau = row.get('brendsen_tau')
 
@@ -81,7 +83,7 @@ def single_point(db_dir: str, row_index: int, mode: str, xc: str, kpts: tuple[in
     #mean_elec_pot_z = broadcast(atoms.calc.get_electrostatic_potential().mean(1).mean(0) - fermi_E)
 
     new_db_dir = f'{name}.db'
-    db_observer(atoms, new_db_dir, temperature, brendsen_tau, 0, calc_pickle)
+    db_observer(atoms, new_db_dir, temperature, brendsen_tau, 0, calc_pickle, current_time=cur_time)
     del atoms,
 
 

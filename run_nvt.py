@@ -41,16 +41,18 @@ class iteration_counter:
 
 
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(5), wait=wait_random(min=60, max=600)) # will retry randomly within 10 min
-def db_observer(atoms: Atoms, database_dir: str, temperature: float, brendsen_tau: float, time_step_size: float, calc_par_pickle: Optional[bytes] = None,):
+def db_observer(atoms: Atoms, database_dir: str, temperature: float, brendsen_tau: float, time_step_size: float, calc_par_pickle: Optional[bytes] = None, current_time: Optional[float] = None):
     mean_elec_pot_z = atoms.calc.get_electrostatic_potential().mean(1).mean(0)
     fermi_E = atoms.calc.get_fermi_level()
     work_function_top = mean_elec_pot_z[-5] - fermi_E # [-1 if not (atoms.calc.parameters.get('mode') if isinstance(atoms.calc.parameters.get('mode'), str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else -3] - fermi_E
     work_function_bot = mean_elec_pot_z[4] - fermi_E #[0 if not (atoms.calc.parameters.get('mode') if isinstance(atoms.calc.parameters.get('mode'), str) else atoms.calc.parameters.get('mode').get('name')).lower() == 'pw' else 2] - fermi_E
     #with db.connect(database_dir) as db_obj:
     db_obj = db.connect(database_dir)
-    global cur_time
     #cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time') + time_step_size
-    cur_time += time_step_size
+    if current_time is None:
+        global cur_time
+        cur_time += time_step_size
+    else: cur_time = current_time
     db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, time_step_size=time_step_size, data=dict(calc_pickle=(str(calc_par_pickle) if calc_par_pickle else str(pickle.dumps(atoms.calc.parameters)))))
 
 
