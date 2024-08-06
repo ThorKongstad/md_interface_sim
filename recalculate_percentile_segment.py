@@ -90,7 +90,7 @@ def main(db_dir: str, nr_segments: int, start_from: int, mode: str, xc: str, kpt
 
     md_panda: pd.DataFrame = build_pd(db_dir)
 
-    percentiles: pd.DataFrame = md_panda['wftop' if from_amanda else 'work_top'].quantile(np.linspace(1, 99, nr_segments), interpolation='nearest')
+    percentiles: pd.DataFrame = md_panda['wftop' if from_amanda else 'work_top'].quantile(np.linspace(0.1, 0.99, nr_segments), interpolation='nearest')
     percen_list = percentiles['wftop' if from_amanda else 'work_top'].to_list
 
     pd_cutout = pd.concat([md_panda.query(f'{"wftop" if from_amanda else "work_top"} == @work_percen').head(1) for work_percen in percen_list])
