@@ -47,7 +47,7 @@ def get_H_count(atoms: ase.Atoms,) -> int:
 
 def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=None, ph: float = 6):
 
-    dbs_dirs, dbs_selection = list(zip(db_dir.split('@') if '@' in db_dir else [db_dir, None] for db_dir in dbs_dirs))
+    dbs_dirs, dbs_selection = list(zip(*(db_dir.split('@') if '@' in db_dir else [db_dir, None] for db_dir in dbs_dirs)))
     for db_dir in dbs_dirs:
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
 
@@ -66,7 +66,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
     )
 
     fig = go.Figure()
-    for key, val in dat_pd:
+    for key, val in dat_pd.items():
         fig.add_trace(make_trace(
             name=key,
             db=val,
