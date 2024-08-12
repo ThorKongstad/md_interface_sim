@@ -1,30 +1,30 @@
 import argparse
-import pickle
+#import pickle
 import os
 import sys
 import pathlib
 from typing import Optional, Sequence, Callable
-from dataclasses import dataclass, field
+#from dataclasses import dataclass, field
 
 import ase
 import pandas as pd
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_random
+#from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_random
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import folder_exist, build_pd
-from md_interface_sim.run_nvt import plot_work_functions
+#from md_interface_sim.run_nvt import plot_work_functions
 
-import numpy as np
+#import numpy as np
 
-import ase.db as db
-from ase import Atoms
-from ase.md.nvtberendsen import NVTBerendsen
-from ase import units
-from ase.parallel import world, barrier, parprint
+#import ase.db as db
+#from ase import Atoms
+#from ase.md.nvtberendsen import NVTBerendsen
+#from ase import units
+#from ase.parallel import world, barrier, parprint
 
-from sqlite3 import OperationalError
+#from sqlite3 import OperationalError
 
-from gpaw import GPAW#, FermiDirac, PoissonSolver, Mixer
+#from gpaw import GPAW#, FermiDirac, PoissonSolver, Mixer
 #from gpaw.utilities import h2gpts
 
 import plotly.graph_objects as go
@@ -55,7 +55,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 
     ghe = lambda pd_series: generalised_hydrogen_electrode(
         E=pd_series['energy'],
-        E_ref=dat_pd[sim_names]['energy'].mean(),
+        E_ref=dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean(),
         n_proton=get_H_count(pd_series.get('atoms')),
         proton_pot= -6.616893,
         n_cat=0, # gotta make a function for counting
