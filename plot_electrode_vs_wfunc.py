@@ -35,10 +35,11 @@ def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, prot
 
 
 def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float]):
-    go.Scatter(
+    return go.Scatter(
         name=name,
         x=db['work_top'],
         y=db.apply(ghe_lambda, axis=1),
+        mode='markers',
     )
 
 
