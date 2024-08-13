@@ -31,7 +31,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 
-def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, proton_pot: float, n_cat: float, cat_pot: float, work_func: float, pH: float, T: float): return E - E_ref - n_cat*cat_pot - 0.5*n_proton*proton_pot - n_proton*(work_func - 2.303 * (8.617*10**-5)*T*pH)
+def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, proton_pot: float, n_cat: float, cat_pot: float, work_func: float, pH: float, T: float): return E - E_ref - n_cat*cat_pot - 0.5*n_proton*proton_pot - n_proton*(4.4 - work_func - 2.303 * (8.617*10**-5)*T*pH)
 
 
 def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float]):
@@ -64,7 +64,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         E=pd_series['energy'],
         E_ref=dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean(),
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot= -6.616893,
+        proton_pot= -6.616893-(-0.49), #
         n_cat=0, # gotta make a function for counting
         cat_pot=0,
         work_func=pd_series['work_top'],
