@@ -37,7 +37,7 @@ def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, prot
 def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float]):
     return go.Scatter(
         name=name,
-        x=db['work_top'],
+        x=db['work_top' if from_amanda not in globals() or not globals().get('from_amanda') else 'wftop'],
         y=db.apply(ghe_lambda, axis=1),
         mode='markers',
     )
@@ -67,9 +67,9 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         proton_pot= -6.616893-(-0.49), #
         n_cat=0, # gotta make a function for counting
         cat_pot=0,
-        work_func=pd_series['work_top'],
+        work_func=pd_series['work_top' if from_amanda not in globals() or not globals().get('from_amanda') else 'wftop'],
         pH=ph,
-        T=pd_series['temperature']
+        T=pd_series['temperature' if from_amanda not in globals() or not globals().get('from_amanda') else 'Temperature']
     )
 
     fig = go.Figure()
@@ -97,7 +97,11 @@ if __name__ == '__main__':
     parser.add_argument('-names', '--sim_names', type=str, nargs='+', help='list of names to use for every database in the plot.')
     parser.add_argument('-ph', '--pH', type=float, default=6)
     parser.add_argument('save_name')
+    parser.add_argument('--from_amanda', action='store_true')
     args = parser.parse_args()
+
+    global from_amanda
+    from_amanda = args.from_amanda
 
     main(dbs_dirs=args.db,
          save_name=args.save_name,
