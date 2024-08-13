@@ -38,11 +38,17 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float])
     go.Scatter(
         name=name,
         x=db['work_top'],
-        y=db.apply(ghe_lambda, axis=0),
+        y=db.apply(ghe_lambda, axis=1),
     )
+
 
 def get_H_count(atoms: ase.Atoms,) -> int:
     return atoms.get_chemical_formula(mode='all').count('H') - 64
+
+
+def sp(x):
+    print(x)
+    return x
 
 
 def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=None, ph: float = 6):
