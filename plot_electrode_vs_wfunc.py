@@ -37,7 +37,7 @@ def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, prot
 def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float]):
     return go.Scatter(
         name=name,
-        x=db['work_top' if from_amanda not in globals() or not globals().get('from_amanda') else 'wftop'],
+        x=db['work_top' if amanda_test() else 'wftop'],
         y=db.apply(ghe_lambda, axis=1),
         mode='markers',
     )
@@ -45,6 +45,11 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float])
 
 def get_H_count(atoms: ase.Atoms,) -> int:
     return atoms.get_chemical_formula(mode='all').count('H') - 64
+
+
+def amanda_test() -> bool:
+    if 'from_amanda' not in globals().keys(): return True
+    return not globals().get('from_amanda')
 
 
 def sp(x):
@@ -67,9 +72,9 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         proton_pot= -6.616893-(-0.49), #
         n_cat=0, # gotta make a function for counting
         cat_pot=0,
-        work_func=pd_series['work_top' if from_amanda not in globals() or not globals().get('from_amanda') else 'wftop'],
+        work_func=pd_series['work_top' if amanda_test() else 'wftop'],
         pH=ph,
-        T=pd_series['temperature' if from_amanda not in globals() or not globals().get('from_amanda') else 'Temperature']
+        T=pd_series['temperature' if amanda_test() else 'Temperature']
     )
 
     fig = go.Figure()
@@ -107,4 +112,3 @@ if __name__ == '__main__':
          save_name=args.save_name,
          sim_names=args.sim_names,
          ph=args.pH)
-    
