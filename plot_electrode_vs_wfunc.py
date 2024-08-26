@@ -107,7 +107,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         T=pd_series['temperature' if not amanda_test() else 'Temperature']
     )
 
-    fig = go.Figure(height=1392, width=697.92)
+    fig = go.Figure()
     for key, val in dat_pd.items():
         fig.add_trace(make_trace(
             name=key,
@@ -120,6 +120,8 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 #        showlegend=False,
         xaxis_title=r'$\Phi$',
         yaxis_title=r'$E_{GCHE}$',
+        height=1392,
+        width=697.92,
     )
 
     fig.update_xaxes(range=[-4, +4])
