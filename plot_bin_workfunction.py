@@ -63,7 +63,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
     )
 
     fig.set_subplots(rows=2, cols=1, row_heights=[0.7, 0.3])
-    fig.add_trace(plot_temperature(panda_data).data, row=2, col=1)
+    fig.add_trace(*plot_temperature(panda_data).data, row=2, col=1)
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
