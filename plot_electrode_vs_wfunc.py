@@ -120,15 +120,17 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 #        showlegend=False,
         xaxis_title=r'$\Phi$',
         yaxis_title=r'$E_{GCHE}$',
-        height=1392,
-        width=697.92,
+#        height=1392,
+#        width=697.92,
     )
 
     fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
 
     folder_exist('plots')
-    fig.write_html('plots/' + save_name + ('.png' if png else '.html'), include_mathjax='cdn')
+    fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
+    if png: fig.write_image('plots/' + save_name + '.png')
+
 
 
 if __name__ == '__main__':

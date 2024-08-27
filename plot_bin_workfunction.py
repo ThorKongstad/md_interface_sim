@@ -34,7 +34,7 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
 
 
 
-def plot_bins_work_func(panda_data: DataFrame, save_name: str):
+def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
 
     mu_fit, sd_fit = norm.fit(panda_data['work_top'].dropna())
@@ -67,20 +67,22 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
+    if png: fig.write_image('plots/' + save_name + '.png')
 
 
-def main(md_db: str):
+def main(md_db: str, png: bool):
     db_dir, db_selection = md_db.split('@') if '@' in md_db else [md_db, None]
     md_pd = build_pd(db_dir, select_key='time>0' if db_selection is None else db_selection)
 
     plot_name = os.path.basename(md_db).replace('.db', '') + '_bin_plot'
 
-    plot_bins_work_func(md_pd, plot_name)
+    plot_bins_work_func(md_pd, plot_name, png)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('db', type=str,  help='selection, can be added after @, note that the format have to follow the ase db select method.')
+    parser.add_argument('--png', action='store_true')
     args = parser.parse_args()
 
-    main(args.db)
+    main(args.db, args.png)
