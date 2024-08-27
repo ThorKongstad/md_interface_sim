@@ -70,7 +70,8 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str):
 
 
 def main(md_db: str):
-    md_pd = build_pd(md_db, select_key='time>0')
+    db_dir, db_selection = md_db.split('@') if '@' in md_db else [md_db, None]
+    md_pd = build_pd(db_dir, select_key='time>0' if db_selection is None else db_selection)
 
     plot_name = os.path.basename(md_db).replace('.db', '') + '_bin_plot'
 
@@ -79,7 +80,7 @@ def main(md_db: str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('db', type=str)
+    parser.add_argument('db', type=str,  help='selection, can be added after @, note that the format have to follow the ase db select method.')
     args = parser.parse_args()
 
     main(args.db)
