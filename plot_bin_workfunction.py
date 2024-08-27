@@ -74,7 +74,7 @@ def main(md_db: str, png: bool):
     db_dir, db_selection = md_db.split('@') if '@' in md_db else [md_db, None]
     md_pd = build_pd(db_dir, select_key='time>0' if db_selection is None else db_selection)
 
-    plot_name = os.path.basename(md_db).replace('.db', '') + '_bin_plot'
+    plot_name = os.path.basename(db_dir).replace('.db', '') + '_bin_plot'
 
     plot_bins_work_func(md_pd, plot_name, png)
 
