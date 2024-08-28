@@ -7,7 +7,7 @@ import pathlib
 from subprocess import call
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from md_interface_sim import build_pd, folder_exist
+from md_interface_sim import build_pd, folder_exist, amanda_test
 
 import numpy as np
 from scipy.stats import norm
@@ -24,29 +24,27 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
 
     fig.add_trace(go.Scatter(
         mode='markers',
-        name='Temperature',
+        name='Temperature' if not amanda_test() else 'Temperature',
         x=panda_data['id'],
-        y=(panda_data['kinitic_E'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
+        y=(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
     ))
 
     return fig
 
 
-
-
 def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
 
-    mu_fit, sd_fit = norm.fit(panda_data['work_top'].dropna())
+    mu_fit, sd_fit = norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].dropna())
 
     fig = go.Figure()
     fig.add_trace(go.Histogram(
-        x=panda_data['work_top'],
+        x=panda_data['work_top' if not amanda_test() else 'wftop'],
         xbins=dict(size=binsize),
         histnorm='percent', # "" | "percent" | "probability" | "density" | "probability density"
     ))
 
-    line = np.linspace(panda_data['work_top'].min(), panda_data['work_top'].max(), 1000)
+    line = np.linspace(panda_data['work_top' if not amanda_test() else 'wftop'].min(), panda_data['work_top' if not amanda_test() else 'wftop'].max(), 1000)
 
     fig.add_trace(go.Scatter(
         x=line,
@@ -83,6 +81,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('db', type=str,  help='selection, can be added after @, note that the format have to follow the ase db select method.')
     parser.add_argument('--png', action='store_true')
+    parser.add_argument('--from_amanda', action='store_true')
     args = parser.parse_args()
+
+    global from_amanda
+    from_amanda = args.from_amanda
 
     main(args.db, args.png)
