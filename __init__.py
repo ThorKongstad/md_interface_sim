@@ -10,6 +10,11 @@ import pandas as pd
 from sqlite3 import OperationalError
 
 
+def amanda_test() -> bool:
+    if 'from_amanda' not in globals().keys(): return False
+    return globals().get('from_amanda')
+
+
 def build_pd(db_dir_list, select_key: Optional = None):
     if isinstance(db_dir_list, str): db_dir_list = [db_dir_list]
     for db_dir in db_dir_list:
