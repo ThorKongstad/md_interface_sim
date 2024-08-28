@@ -7,7 +7,7 @@ import pathlib
 from subprocess import call
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from md_interface_sim import build_pd, folder_exist, amanda_test
+from md_interface_sim import build_pd, folder_exist
 
 import numpy as np
 from scipy.stats import norm
@@ -15,6 +15,11 @@ from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 from numpy import histogram_bin_edges
+
+
+def amanda_test() -> bool:
+    if 'from_amanda' not in globals().keys(): return False
+    return globals().get('from_amanda')
 
 
 def plot_temperature(panda_data: DataFrame,) -> go.Figure:
