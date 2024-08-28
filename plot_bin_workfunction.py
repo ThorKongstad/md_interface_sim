@@ -14,6 +14,7 @@ from scipy.stats import norm
 from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
+from numpy import histogram_bin_edges
 
 
 def plot_temperature(panda_data: DataFrame,) -> go.Figure:
@@ -33,14 +34,20 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
 
 
 def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
-    binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
+    bin_edges = histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].dropna(), bins='fd')
+    binsize = bin_edges[1] - bin_edges[0]
+    #binsize = 0.02 # this is not the correct way to do stuff, but it is the fast way.
 
     mu_fit, sd_fit = norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].dropna())
 
     fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=panda_data['work_top' if not amanda_test() else 'wftop'],
-        xbins=dict(size=binsize),
+        xbins=dict(
+            start=bin_edges[0],
+            size=binsize,
+            end=bin_edges[-1]
+        ),
         histnorm='percent', # "" | "percent" | "probability" | "density" | "probability density"
     ))
 
