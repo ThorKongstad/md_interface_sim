@@ -59,7 +59,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
     )
 
     for db_name in dat_pd.keys():
-        dat_pd[db_name].assign(GHE=dat_pd[db_name].apply(ghe, axis=1))
+        dat_pd[db_name].insert( dat_pd[db_name].shape[1], 'GHE', dat_pd[db_name].apply(ghe, axis=1))
 
 
     cov_bins_size = 0.02
