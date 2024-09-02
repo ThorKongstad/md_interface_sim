@@ -72,7 +72,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         partition_temp = 0
         for db in dat_pd.values():
             if (db_pot := db.query('@pot < GHE > @pot + @cov_bins_size')).shape[0] > 0:
-                name_later = np.exp(-db_pot['GHE'] / (0.000086173303*db_pot['temperature' if not amanda_test() else 'Temperature']))
+                name_later = np.sum(np.exp(-db_pot['GHE'] / (0.000086173303*db_pot['temperature' if not amanda_test() else 'Temperature'])))
                 thata_temp += get_H_count(db.iloc[0].get('atoms')) * name_later
                 partition_temp += name_later
         theta += [thata_temp]
