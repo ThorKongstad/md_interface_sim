@@ -129,7 +129,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
     )
 
     for trace in fig.data:
-        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.line.get('color'))
+        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.line.color)
 
     fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
