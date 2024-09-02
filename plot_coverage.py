@@ -63,7 +63,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 
 
     cov_bins_size = 0.02
-    cov_bins_linSp = np.linspace(start=(bins_start := 2.5), endpoint=(bins_end := 6.5), num=(bins_end - bins_start)/cov_bins_size)
+    cov_bins_linSp = np.linspace(start=(bins_start := 2.5), stop=(bins_end := 6.5), num=(bins_end - bins_start)/cov_bins_size)
     theta = []
     partition = []
 
