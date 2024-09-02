@@ -63,7 +63,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 
 
     cov_bins_size = 0.02
-    cov_bins_linSp = np.linspace(start=(bins_start := 2.5), stop=(bins_end := 6.5), num=(bins_end - bins_start)/cov_bins_size)
+    cov_bins_linSp = np.linspace(start=(bins_start := 2.5), stop=(bins_end := 6.5), num=int((bins_end - bins_start)/cov_bins_size))
     theta = []
     partition = []
 
@@ -71,7 +71,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         thata_temp = 0
         partition_temp = 0
         for db in dat_pd.values():
-            if (db_pot := db.query('@pot < ghe > @pot + @cov_bins_size')).shape[0] > 0:
+            if (db_pot := db.query('@pot < GHE > @pot + @cov_bins_size')).shape[0] > 0:
                 name_later = np.exp(-db_pot['ghe'] / (0.000086173303*db_pot['temperature' if not amanda_test() else 'Temperature']))
                 thata_temp += get_H_count(db.iloc(0)['atoms']) * name_later
                 partition_temp += name_later
