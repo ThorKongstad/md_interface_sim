@@ -69,7 +69,7 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float])
         y=db.apply(ghe_lambda, axis=1),
         meta=dict(xmean=mean(x_val)),
         mode='markers',
-        marker=dict(opacity=0.05),
+        #marker=dict(opacity=0.05),
         hovertemplate='mean: %{meta.xmean:.2f}'
     )
 
@@ -131,7 +131,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
     for trace in fig.data:
         fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.line.color)
 
-    fig.update_xaxes(range=[-4, +4])
+    #fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
 
     folder_exist('plots')
