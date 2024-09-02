@@ -59,13 +59,18 @@ class Ion:
 
 def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, proton_pot: float, cat_list: Sequence[Ion], work_func: float, pH: float, T: float): return E - E_ref - sum(ion.n * ion.E for ion in cat_list) - 0.5*n_proton*proton_pot - n_proton*(4.4 - work_func - 2.303 * (8.617*10**-5)*T*pH)
 
+def mean(values: Sequence[float]) -> float: return sum(values) / len(values)
+
 
 def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float]):
     return go.Scatter(
         name=name,
-        x=db['work_top' if not amanda_test() else 'wftop'],
+        x=(x_val:= db['work_top' if not amanda_test() else 'wftop']),
         y=db.apply(ghe_lambda, axis=1),
+        meta=dict(xmean=mean(x_val)),
         mode='markers',
+        marker=dict(opacity=0.05),
+        hovertemplate='mean: %{meta.xmean:.2f}'
     )
 
 
@@ -113,7 +118,6 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
             name=key,
             db=val,
             ghe_lambda=ghe
-
         ))
 
     fig.update_layout(
@@ -123,6 +127,9 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
 #        height=1392,
 #        width=697.92,
     )
+
+    for trace in fig.data:
+        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.line.get('color'))
 
     fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
