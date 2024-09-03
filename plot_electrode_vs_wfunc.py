@@ -40,9 +40,9 @@ class Ion:
 
     def __post_init__(self):
         if self.E is None:
-            E_H2 = -6.616893  # RPBE lcao calculation with Cu ghost
+            E_H2 = -6.635# -6.616893  # RPBE lcao calculation with Cu ghost
             E_H2O = -13.528367  # RPBE lcao calculation with Cu ghost
-            G_H2 = -6.616893-(-0.49)
+            G_H2 = E_H2-(-0.49)
             match self.name:
                 case 'Na':
                     E_Na2O_s = -36.713522 / 4  # eight Na atoms in unit cell
@@ -73,8 +73,10 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
         mode='markers',
         hovertemplate='mean: %{meta.xmean:.2f}',
         marker=dict(
+#            opacity=0.7,
 #            colorscale='RdBu',
 #            color=color_fraction,
+            line=dict(color='DarkSlateGrey'),
         ),
     )
 
@@ -97,8 +99,7 @@ def sp(x):
     return x
 
 
-def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=None, ph: float = 6, png: bool = False):
-
+def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] = None, ph: float = 6, png: bool = False):
     dbs_dirs, dbs_selection = list(zip(*(db_dir.split('@') if '@' in db_dir else [db_dir, None] for db_dir in dbs_dirs)))
     for db_dir in dbs_dirs:
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
@@ -109,7 +110,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         E=pd_series['energy'],
         E_ref=dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean(),
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot=-6.616893-(-0.49), #ss
+        proton_pot= -6.635-(-0.49),#-6.616893-(-0.49), #ss
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
         pH=ph,
