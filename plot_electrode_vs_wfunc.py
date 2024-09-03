@@ -125,7 +125,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
             name=key,
             db=val,
             ghe_lambda=ghe,
-            color_fraction=0.5 + (val.iloc[0].get('atoms')/max_pro_devi) * 0.5
+            color_fraction=0.5 + (get_H_count(val.iloc[0].get('atoms'))/max_pro_devi) * 0.5
         ))
 
     fig.update_layout(
