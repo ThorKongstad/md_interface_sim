@@ -116,7 +116,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]]=
         T=pd_series['temperature' if not amanda_test() else 'Temperature']
     )
 
-    proton_counts = [get_H_count(db.iloc[0].get('atoms')) for db in dat_pd]
+    proton_counts = [get_H_count(db.iloc[0].get('atoms')) for db in dat_pd.values()]
     max_pro_devi = max(proton_counts, key=abs)
 
     fig = go.Figure()
