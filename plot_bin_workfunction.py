@@ -53,7 +53,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
             size=binsize,
             end=bin_edges[-1]
         ),
-        histnorm='percent', # "" | "percent" | "probability" | "density" | "probability density"
+        histnorm= "probability density", # "" | "percent" | "probability" | "density" | "probability density"
     ))
 
     line = np.linspace(panda_data['work_top' if not amanda_test() else 'wftop'].min(), panda_data['work_top' if not amanda_test() else 'wftop'].max(), 1000)
