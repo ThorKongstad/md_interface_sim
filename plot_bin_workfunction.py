@@ -35,6 +35,43 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
         y=(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
     ))
 
+    fig.update_layout(
+        xaxis_title=r'Temperature (K)',
+        yaxis_title='Id nr',
+    )
+
+    return fig
+
+
+def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
+    bin_edges_x = histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].dropna(), bins='fd')
+    binsize_x = bin_edges_x[1] - bin_edges_x[0]
+
+    bin_edges_y = histogram_bin_edges(panda_data['time'].dropna(), bins='fd')
+    binsize_y = bin_edges_y[1] - bin_edges_y[0]
+
+    fig= go.Figure()
+    fig.add_trace(go.Histogram2d(
+        x=panda_data['work_top' if not amanda_test() else 'wftop'],
+        y=panda_data['time'],
+        histnorm="probability density",
+        xbins=dict(
+            start=bin_edges_x[0],
+            size=binsize_x,
+            end=bin_edges_x[-1]
+        ),
+        ybins=dict(
+            start=bin_edges_y[0],
+            size=binsize_y,
+            end=bin_edges_y[-1]
+        ),
+    ))
+
+    fig.update_layout(
+        xaxis_title=r'$\Phi$',
+        yaxis_title='time',
+    )
+
     return fig
 
 
@@ -72,8 +109,16 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
         title=f'Count: {len(panda_data.index)}'
     )
 
-    fig.set_subplots(rows=2, cols=1, row_heights=[0.7, 0.3])
-    fig.add_trace(*plot_temperature(panda_data).data, row=2, col=1)
+    fig.set_subplots(rows=2, cols=2,
+                     specs=[[{}, {}],
+                            [{"colspan": 2}, None]],
+                     row_heights=[0.7, 0.3])
+
+    fig.add_trace(*(T_plot := plot_temperature(panda_data)).data, row=2, col=2)
+    fig.update_layout(*T_plot.layout, row=2, col=2)
+
+    fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
+    fig.update_layout(*hist3d_plot.layout, row=1, col=2)
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
