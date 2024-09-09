@@ -115,10 +115,10 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
                      row_heights=[0.7, 0.3])
 
     fig.add_trace(*(T_plot := plot_temperature(panda_data)).data, row=2, col=1)
-    fig.update_layout(**T_plot.layout.__dict__, row=2, col=1)
+    fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
 
     fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
-    fig.update_layout(**hist3d_plot.layout.__dict__, row=1, col=2)
+    fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
