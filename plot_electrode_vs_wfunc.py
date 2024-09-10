@@ -76,8 +76,8 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
     ion_list = get_ion_count(db.iloc[0].get('atoms'))
 
     Hcoler_args = dict(
-            colorscale='RdBu',
-            color=Hcolor_fraction,
+            #colorscale='RdBu',
+            color=px.colors.sample_colorscale(colorscale='RdBu', samplepoints=Hcolor_fraction)[0],
     ) if Hcolor_fraction is not None else dict()
 
     return go.Scatter(
@@ -89,7 +89,7 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
         hovertemplate='mean: %{meta.xmean:.2f}',
         marker=dict(
 #            opacity=0.7,
-            line=dict(color='DarkSlateGrey' if len(ion_list) == 0 else ion_list[0].colour),
+            line=dict(color=('DarkSlateGrey' if len(ion_list) == 0 else ion_list[0].colour), width=2),
             **Hcoler_args
         ),
     )
@@ -153,7 +153,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     )
 
     for trace in fig.data:
-        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color if not Hcolor_bool else px.colors.sample_colorscale(colorscale=trace.meta.get('colour_scale'), samplepoints=trace.marker.color)[0])
+        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color )# if not Hcolor_bool else px.colors.sample_colorscale(colorscale=trace.meta.get('colour_scale'), samplepoints=trace.marker.color)[0])
 
     #fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
