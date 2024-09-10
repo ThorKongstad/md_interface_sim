@@ -84,7 +84,7 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
         name=name,
         x=(x_val:= db['work_top' if not amanda_test() else 'wftop']),
         y=db.apply(ghe_lambda, axis=1),
-        meta=dict(xmean=mean(x_val), colour_scale='RbBu'),
+        meta=dict(xmean=mean(x_val), colour_scale='RdBu'),
         mode='markers',
         hovertemplate='mean: %{meta.xmean:.2f}',
         marker=dict(
