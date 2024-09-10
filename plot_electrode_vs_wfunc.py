@@ -37,6 +37,7 @@ class Ion:
     n: int
     name: str
     E: float = None
+    colour: str = None
 
     def __post_init__(self):
         if self.E is None:
@@ -57,6 +58,13 @@ class Ion:
                     #G_Li_s = 1.875098276
                     #self.E =
 
+        if self.colour is None:
+            match self.name:
+                case 'Na':
+                    self.colour = 'rgb(171, 92, 243)' #jmol
+                case 'K':
+                    self.colour = 'rgb(143, 64, 212)'
+
 
 def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, proton_pot: float, cat_list: Sequence[Ion], work_func: float, pH: float, T: float): return E - E_ref - sum(ion.n * ion.E for ion in cat_list) - 0.5*n_proton*proton_pot - n_proton*(4.4 - work_func - 2.303 * (8.617*10**-5)*T*pH)
 
@@ -64,7 +72,14 @@ def generalised_hydrogen_electrode(E: float, E_ref: float, n_proton: float, prot
 def mean(values: Sequence[float]) -> float: return sum(values) / len(values)
 
 
-def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float], color_fraction: float):
+def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float], Hcolor_fraction: Optional[float] = None):
+    ion_list = get_ion_count(db.iloc[0].get('atoms'))
+
+    Hcoler_args = dict(
+            colorscale='RdBu',
+            color=Hcolor_fraction,
+    ) if Hcolor_fraction is not None else dict()
+
     return go.Scatter(
         name=name,
         x=(x_val:= db['work_top' if not amanda_test() else 'wftop']),
@@ -74,9 +89,8 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
         hovertemplate='mean: %{meta.xmean:.2f}',
         marker=dict(
 #            opacity=0.7,
-#            colorscale='RdBu',
-#            color=color_fraction,
-            line=dict(color='DarkSlateGrey'),
+            line=dict(color='DarkSlateGrey' if len(ion_list) == 0 else ion_list[0].colour),
+            **Hcoler_args
         ),
     )
 
@@ -99,7 +113,7 @@ def sp(x):
     return x
 
 
-def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] = None, ph: float = 6, png: bool = False):
+def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] = None, ph: float = 6, png: bool = False, Hcolor_bool: bool = False):
     dbs_dirs, dbs_selection = list(zip(*(db_dir.split('@') if '@' in db_dir else [db_dir, None] for db_dir in dbs_dirs)))
     for db_dir in dbs_dirs:
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
@@ -110,15 +124,16 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
         E=pd_series['energy'],
         E_ref=dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean(),
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot= -6.635-(-0.49),#-6.616893-(-0.49), #ss
+        proton_pot=-6.635-(-0.49),#-6.616893-(-0.49), #ss
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
         pH=ph,
         T=pd_series['temperature' if not amanda_test() else 'Temperature']
     )
 
-    proton_counts = [get_H_count(db.iloc[0].get('atoms')) for db in dat_pd.values()]
-    max_pro_devi = max(proton_counts, key=abs)
+    if Hcolor_bool:
+        proton_counts = [get_H_count(db.iloc[0].get('atoms')) for db in dat_pd.values()]
+        max_pro_devi = max(proton_counts, key=abs)
 
     fig = go.Figure()
     for key, val in dat_pd.items():
@@ -126,7 +141,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
             name=key,
             db=val,
             ghe_lambda=ghe,
-            color_fraction=0.5 + (get_H_count(val.iloc[0].get('atoms'))/max_pro_devi) * 0.5
+            Hcolor_fraction=((0.5 + (get_H_count(val.iloc[0].get('atoms'))/max_pro_devi) * 0.5) if Hcolor_bool else None),
         ))
 
     fig.update_layout(
@@ -148,7 +163,6 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     if png: fig.write_image('plots/' + save_name + '.png')
 
 
-
 if __name__ == '__main__':
     parser =argparse.ArgumentParser()
     parser.add_argument('db', type=str,  nargs='+', help='selection, can be added after @, note that the format have to follow the ase db select method. first database is reference!!!')
@@ -157,6 +171,7 @@ if __name__ == '__main__':
     parser.add_argument('-ph', '--pH', type=float, default=6)
     parser.add_argument('--from_amanda', action='store_true')
     parser.add_argument('--png', action='store_true')
+    parser.add_argument('--Hcolour', action='store_true', help='bool for colouring after no. of H')
     args = parser.parse_args()
 
     global from_amanda
@@ -166,4 +181,5 @@ if __name__ == '__main__':
          save_name=args.save_name,
          sim_names=args.sim_names,
          ph=args.pH,
-         png=args.png)
+         png=args.png,
+         Hcolor_bool=args.Hcolour)
