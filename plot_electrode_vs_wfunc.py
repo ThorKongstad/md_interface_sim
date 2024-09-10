@@ -84,7 +84,7 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
         name=name,
         x=(x_val:= db['work_top' if not amanda_test() else 'wftop']),
         y=db.apply(ghe_lambda, axis=1),
-        meta=dict(xmean=mean(x_val)),
+        meta=dict(xmean=mean(x_val), colour_scale='RbBu'),
         mode='markers',
         hovertemplate='mean: %{meta.xmean:.2f}',
         marker=dict(
@@ -109,7 +109,7 @@ def amanda_test() -> bool:
 
 
 def sp(x):
-    print(x)
+    print(x, type(x))
     return x
 
 
@@ -153,7 +153,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     )
 
     for trace in fig.data:
-        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color) # px.colors.sample_colorscale(colorscale=trace.marker.colorscale, samplepoints=[trace.marker.color]))
+        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color if not Hcolor_bool else px.colors.sample_colorscale(colorscale=trace.meta.get('colour_scale'), samplepoints=trace.marker.color))
 
     #fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
