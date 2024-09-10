@@ -160,9 +160,10 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
             line_width=3,
             label=dict(
                 text=trace.name,
-                textposition="end",
+                textposition="start",
+                textangle=90,
+                padding=30,
                 font=dict(size=15)
-
             )
         )
 
