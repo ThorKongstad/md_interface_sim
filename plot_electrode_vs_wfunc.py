@@ -119,10 +119,12 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
 
     dat_pd = {name: build_pd(db_dir, select_key=sel_key) for name, db_dir, sel_key in zip(sim_names if sim_names is not None else dbs_dirs, dbs_dirs, dbs_selection)}
+    reference_mean = dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean() \
+                    + dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['kinitic_E' if not amanda_test() else 'Ekin'].mean()
 
     ghe = lambda pd_series: generalised_hydrogen_electrode(
-        E=pd_series['energy'],
-        E_ref=dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean(),
+        E=pd_series['energy'] + pd_series['kinitic_E' if not amanda_test() else 'Ekin'],
+        E_ref=reference_mean,
         n_proton=get_H_count(pd_series.get('atoms')),
         proton_pot=-6.635-(-0.49),#-6.616893-(-0.49), #ss
         cat_list=get_ion_count(pd_series.get('atoms')),
