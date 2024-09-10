@@ -153,7 +153,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     )
 
     for trace in fig.data:
-        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color if not Hcolor_bool else px.colors.sample_colorscale(colorscale=trace.meta.get('colour_scale'), samplepoints=trace.marker.color))
+        fig.add_vline(x=trace.meta.get('xmean'), line_dash='dash', line_color=trace.marker.color if not Hcolor_bool else px.colors.sample_colorscale(colorscale=trace.meta.get('colour_scale'), samplepoints=trace.marker.color)[0])
 
     #fig.update_xaxes(range=[-4, +4])
     fig.update_yaxes(range=[-20, +20])
