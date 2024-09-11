@@ -74,7 +74,7 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
     fig= go.Figure()
     fig.add_trace(go.Histogram2d(
         x=panda_data['work_top' if not amanda_test() else 'wftop'],
-        y=panda_data['time'],
+        y=panda_data['time' if not amanda_test() else 'id'],
         histnorm="probability density",
         xbins=dict(
             start=bin_edges_x[0],
