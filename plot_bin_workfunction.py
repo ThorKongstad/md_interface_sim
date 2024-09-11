@@ -138,17 +138,17 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
 
     fig.add_trace(*(T_plot := plot_temperature(panda_data)).data, row=2, col=1)
     #fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
-    fig.update_xaxes(title_text=T_plot.layout.get('xaxis_title'), row=2, col=1)
-    fig.update_yaxes(title_text=T_plot.layout.get('yaxis_title'), row=2, col=1)
+    fig.update_xaxes(title_text=T_plot.layout.__dict__.get('xaxis_title'), row=2, col=1)
+    fig.update_yaxes(title_text=T_plot.layout.__dict__.get('yaxis_title'), row=2, col=1)
 
     fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
     #fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
-    fig.update_xaxes(title_text=hist3d_plot.layout.get('xaxis_title'), row=1, col=2)
-    fig.update_yaxes(title_text=hist3d_plot.layout.get('yaxis_title'), row=1, col=2)
+    fig.update_xaxes(title_text=hist3d_plot.layout.__dict__.get('xaxis_title'), row=1, col=2)
+    fig.update_yaxes(title_text=hist3d_plot.layout.__dict__.get('yaxis_title'), row=1, col=2)
 
-    fig.add_trace(*(residual_plot := plot_residual_energy(panda_data)).data, row=3, col=2)
-    fig.update_xaxes(title_text=residual_plot.layout.get('xaxis_title'), row=3, col=2)
-    fig.update_yaxes(title_text=residual_plot.layout.get('yaxis_title'), row=3, col=2)
+    fig.add_trace(*(residual_plot := plot_residual_energy(panda_data)).data, row=3, col=1)
+    fig.update_xaxes(title_text=residual_plot.layout.__dict__.get('xaxis_title'), row=3, col=1)
+    fig.update_yaxes(title_text=residual_plot.layout.__dict__.get('yaxis_title'), row=3, col=1)
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
