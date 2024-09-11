@@ -37,8 +37,8 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
     ))
 
     fig.update_layout(
-        xaxis_title=r'Temperature (K)',
-        yaxis_title='Id nr',
+        yaxis_title=r'Temperature (K)',
+        xaxis_title='Id nr',
     )
 
     return fig
@@ -57,8 +57,8 @@ def plot_residual_energy(panda_data: DataFrame,) -> go.Figure:
     ))
 
     fig.update_layout(
-        xaxis_title=r'e_i - <E[i:]>',
-        yaxis_title='Id nr',
+        yaxis_title=r'e_i - <E[i:]>',
+        xaxis_title='Id nr',
     )
 
     return fig
@@ -68,7 +68,7 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
     bin_edges_x = histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].dropna(), bins='fd')
     binsize_x = bin_edges_x[1] - bin_edges_x[0]
 
-    bin_edges_y = histogram_bin_edges(panda_data['time'].dropna(), bins='fd')
+    bin_edges_y = histogram_bin_edges(panda_data['time' if not amanda_test() else 'id'].dropna(), bins='fd')
     binsize_y = bin_edges_y[1] - bin_edges_y[0]
 
     fig= go.Figure()
