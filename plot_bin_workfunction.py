@@ -15,6 +15,7 @@ from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 from numpy import histogram_bin_edges
+from scipy.stats import norm
 
 
 def amanda_test() -> bool:
@@ -37,6 +38,26 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
 
     fig.update_layout(
         xaxis_title=r'Temperature (K)',
+        yaxis_title='Id nr',
+    )
+
+    return fig
+
+def plot_residual_energy(panda_data: DataFrame,) -> go.Figure:
+    fig = go.Figure()
+
+    residual = lambda index: norm.fit(panda_data['energy'].iloc[index:] + panda_data['kinitic_E' if not amanda_test() else 'Ekin'].iloc[index:])[1]
+    residual_gen = map(residual, range(panda_data.shape[0]))
+
+    fig.add_trace(go.Scatter(
+        mode='markers',
+        name='Temperature' if not amanda_test() else 'Temperature',
+        x=panda_data['id'],
+        y=residual_gen,
+    ))
+
+    fig.update_layout(
+        xaxis_title=r'e_i - <E[i:]>',
         yaxis_title='Id nr',
     )
 
@@ -109,8 +130,9 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
         title=f'Count: {len(panda_data.index)}'
     )
 
-    fig.set_subplots(rows=2, cols=2,
+    fig.set_subplots(rows=3, cols=2,
                      specs=[[{}, {}],
+                            [{"colspan": 2}, None],
                             [{"colspan": 2}, None]],
                      row_heights=[0.7, 0.3])
 
@@ -119,6 +141,8 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
 
     fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
     #fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
+
+    fig.add_trace(*(residual_plot := plot_residual_energy(panda_data)).data, row=3, col=2)
 
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
