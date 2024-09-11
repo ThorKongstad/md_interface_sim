@@ -53,7 +53,7 @@ def plot_residual_energy(panda_data: DataFrame,) -> go.Figure:
         mode='markers',
         name='Temperature' if not amanda_test() else 'Temperature',
         x=panda_data['id'],
-        y=residual_gen,
+        y=tuple(residual_gen),
     ))
 
     fig.update_layout(
