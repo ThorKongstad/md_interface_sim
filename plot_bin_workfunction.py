@@ -134,7 +134,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
                      specs=[[{}, {}],
                             [{"colspan": 2}, None],
                             [{"colspan": 2}, None]],
-                     row_heights=[0.7, 0.3])
+                     row_heights=[0.5, 0.25, 0.25])
 
     fig.add_trace(*(T_plot := plot_temperature(panda_data)).data, row=2, col=1)
     #fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
