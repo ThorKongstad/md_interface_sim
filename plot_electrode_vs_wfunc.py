@@ -103,6 +103,12 @@ def get_ion_count(atoms: ase.Atoms):
     return tuple(Ion(n=atoms.get_chemical_formula(mode='all').count(ion), name=ion) for ion in ('K', 'Na') if ion in atoms.get_chemical_formula(mode='all'))
 
 
+def get_temperature(pd_series: pd.Series) -> float:
+    atoms = pd_series['atoms']
+    free_atoms = len(atoms) - sum([len(con.index) for con in atoms.constraints])
+    return (pd_series['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms
+
+
 def amanda_test() -> bool:
     if 'from_amanda' not in globals().keys(): return False
     return globals().get('from_amanda')
@@ -118,15 +124,17 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     for db_dir in dbs_dirs:
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
 
-    dat_pd = {name: build_pd(db_dir, select_key=sel_key) for name, db_dir, sel_key in zip(sim_names if sim_names is not None else dbs_dirs, dbs_dirs, dbs_selection)}
-    reference_mean = dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['energy'].mean() \
-                    + dat_pd[sim_names[0] if sim_names is not None else dbs_dirs[0]]['kinitic_E' if not amanda_test() else 'Ekin'].mean()
+    if sim_names is None: sim_names = [os.path.basename(db_dir) for db_dir in dbs_dirs]
+
+    dat_pd = {name: build_pd(db_dir, select_key=sel_key) for name, db_dir, sel_key in zip(sim_names, dbs_dirs, dbs_selection)}
+    reference_mean = (dat_pd[sim_names[0]]['energy']
+                    + dat_pd[sim_names[0]]['kinitic_E' if not amanda_test() else 'Ekin']).mean()
 
     ghe = lambda pd_series: generalised_hydrogen_electrode(
         E=pd_series['energy'] + pd_series['kinitic_E' if not amanda_test() else 'Ekin'],
         E_ref=reference_mean,
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot=-6.635-(-0.49),#-6.616893-(-0.49), #ss
+        proton_pot=-6.644-(-0.49),#-6.616893-(-0.49), #ss
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
         pH=ph,
