@@ -51,7 +51,7 @@ def plot_residual_energy(panda_data: DataFrame,) -> go.Figure:
 
     fig.add_trace(go.Scatter(
         mode='markers',
-        name='Temperature' if not amanda_test() else 'Temperature',
+        name='energy residual',
         x=panda_data['id'],
         y=tuple(residual_gen),
     ))
