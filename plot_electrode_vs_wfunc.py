@@ -134,7 +134,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
         E=pd_series['energy'] + pd_series['kinitic_E' if not amanda_test() else 'Ekin'],
         E_ref=reference_mean,
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot=-6.644-(-0.49),#-6.616893-(-0.49), #ss
+        proton_pot= (-6.644-(-0.49) if not amanda_test() else -6.616893-(-0.49)), #ss
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
         pH=ph,
