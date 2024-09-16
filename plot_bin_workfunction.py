@@ -33,7 +33,7 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
         mode='markers',
         name='Temperature' if not amanda_test() else 'Temperature',
         x=panda_data['id'],
-        y=(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
+        y=(at.get_temperature for at in panda_data['atoms'].iloc) #(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
     ))
 
     fig.update_layout(
@@ -42,6 +42,7 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
     )
 
     return fig
+
 
 def plot_residual_energy(panda_data: DataFrame,) -> go.Figure:
     fig = go.Figure()
@@ -71,7 +72,7 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
     bin_edges_y = histogram_bin_edges(panda_data['time' if not amanda_test() else 'id'].dropna(), bins='fd')
     binsize_y = bin_edges_y[1] - bin_edges_y[0]
 
-    fig= go.Figure()
+    fig = go.Figure()
     fig.add_trace(go.Histogram2d(
         x=panda_data['work_top' if not amanda_test() else 'wftop'],
         y=panda_data['time' if not amanda_test() else 'id'],
@@ -86,6 +87,39 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
             size=binsize_y,
             end=bin_edges_y[-1]
         ),
+    ))
+
+    fig.update_layout(
+        xaxis_title=r'$\Phi$',
+        yaxis_title='time',
+    )
+
+    return fig
+
+
+def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
+    fig = go.Figure()
+
+    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])[1]
+    residual_gen = list(map(residual, range(panda_data.shape[0])))
+
+    upper_bound = [val + sigma for val, sigma in zip(panda_data['work_top' if not amanda_test() else 'wftop'].iloc, residual_gen)]
+    lower_bound = [val - sigma for val, sigma in zip(panda_data['work_top' if not amanda_test() else 'wftop'].iloc, residual_gen)]
+
+    fig.add_trace(go.Scatter(
+        mode='lines',
+        y=panda_data['work_top' if not amanda_test() else 'wftop'],
+        x=panda_data['time' if not amanda_test() else 'id'],
+    ))
+
+    fig.add_trace(go.Scatter(
+        #mode='lines',
+        x=panda_data['time' if not amanda_test() else 'id'].to_list() + panda_data['time' if not amanda_test() else 'id'].iloc[::-1].to_list(),
+        y=upper_bound + list(reversed(lower_bound)),
+        hoverinfo="skip",
+        showlegend=False,
+        fill='toself',
+        fillcolor='rgba(0,100,80,0.2)',
     ))
 
     fig.update_layout(
@@ -111,7 +145,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
             size=binsize,
             end=bin_edges[-1]
         ),
-        histnorm= "probability density", # "" | "percent" | "probability" | "density" | "probability density"
+        histnorm= "probability density",# "" | "percent" | "probability" | "density" | "probability density"
     ))
 
     line = np.linspace(panda_data['work_top' if not amanda_test() else 'wftop'].min(), panda_data['work_top' if not amanda_test() else 'wftop'].max(), 1000)
@@ -126,7 +160,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     fig.update_layout(
         showlegend=False,
         xaxis_title=r'$\Phi$',
-        yaxis_title='Image count',
+        yaxis_title='Image count density',
         title=f'Count: {len(panda_data.index)}'
     )
 
@@ -141,10 +175,15 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     fig.update_xaxes(title_text=T_plot.layout.xaxis.title.text, row=2, col=1)
     fig.update_yaxes(title_text=T_plot.layout.yaxis.title.text, row=2, col=1)
 
-    fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
+    #fig.add_trace(*(hist3d_plot := plot_3d_hist(panda_data)).data, row=1, col=2)
     #fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
-    fig.update_xaxes(title_text=hist3d_plot.layout.xaxis.title.text, row=1, col=2)
-    fig.update_yaxes(title_text=hist3d_plot.layout.yaxis.title.text, row=1, col=2)
+    #fig.update_xaxes(title_text=hist3d_plot.layout.xaxis.title.text, row=1, col=2)
+    #fig.update_yaxes(title_text=hist3d_plot.layout.yaxis.title.text, row=1, col=2)
+
+    fig.add_trace(*(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, row=1, col=2)
+    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
+    fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
+    fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
 
     fig.add_trace(*(residual_plot := plot_residual_energy(panda_data)).data, row=3, col=1)
     fig.update_xaxes(title_text=residual_plot.layout.xaxis.title.text, row=3, col=1)
