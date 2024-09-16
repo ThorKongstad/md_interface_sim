@@ -5,6 +5,7 @@ import time
 import sys
 import pathlib
 from subprocess import call
+#from operator import itemgetter
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import build_pd, folder_exist
@@ -100,15 +101,15 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
 def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     fig = go.Figure()
 
-    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])[1]
+    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
     residual_gen = list(map(residual, range(panda_data.shape[0])))
 
-    upper_bound = [val + sigma for val, sigma in zip(panda_data['work_top' if not amanda_test() else 'wftop'].iloc, residual_gen)]
-    lower_bound = [val - sigma for val, sigma in zip(panda_data['work_top' if not amanda_test() else 'wftop'].iloc, residual_gen)]
+    upper_bound = [res_norm[0] + res_norm[1] for res_norm in residual_gen]
+    lower_bound = [res_norm[0] - res_norm[1] for res_norm in residual_gen]
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=panda_data['work_top' if not amanda_test() else 'wftop'],
+        y= [res_norm[0] for res_norm in residual_gen],
         x=panda_data['time' if not amanda_test() else 'id'],
     ))
 
@@ -123,8 +124,8 @@ def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     ))
 
     fig.update_layout(
-        xaxis_title=r'$\Phi$',
-        yaxis_title='time',
+        yaxis_title=r'$\Phi$',
+        xaxis_title='time',
     )
 
     return fig
@@ -170,7 +171,7 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
                             [{"colspan": 2}, None]],
                      row_heights=[0.5, 0.25, 0.25])
 
-    fig.add_trace(*(T_plot := plot_temperature(panda_data)).data, row=2, col=1)
+    fig.add_traces(data=(T_plot := plot_temperature(panda_data)).data, rows=2, cols=1)
     #fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
     fig.update_xaxes(title_text=T_plot.layout.xaxis.title.text, row=2, col=1)
     fig.update_yaxes(title_text=T_plot.layout.yaxis.title.text, row=2, col=1)
@@ -180,12 +181,12 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     #fig.update_xaxes(title_text=hist3d_plot.layout.xaxis.title.text, row=1, col=2)
     #fig.update_yaxes(title_text=hist3d_plot.layout.yaxis.title.text, row=1, col=2)
 
-    fig.add_trace(*(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, row=1, col=2)
+    fig.add_traces(data=(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, rows=1, cols=2)
     # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
     fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
     fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
 
-    fig.add_trace(*(residual_plot := plot_residual_energy(panda_data)).data, row=3, col=1)
+    fig.add_traces(data=(residual_plot := plot_residual_energy(panda_data)).data, rows=3, cols=1)
     fig.update_xaxes(title_text=residual_plot.layout.xaxis.title.text, row=3, col=1)
     fig.update_yaxes(title_text=residual_plot.layout.yaxis.title.text, row=3, col=1)
 
