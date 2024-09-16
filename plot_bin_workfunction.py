@@ -33,7 +33,7 @@ def plot_temperature(panda_data: DataFrame,) -> go.Figure:
         mode='markers',
         name='Temperature' if not amanda_test() else 'Temperature',
         x=panda_data['id'],
-        y=(at.get_temperature for at in panda_data['atoms'].iloc) #(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms,
+        y=(panda_data['kinitic_E' if not amanda_test() else 'Ekin'] * (2/3)) / (0.000086173303*free_atoms) * len(atoms)/free_atoms, #(at.get_temperature() for at in panda_data['atoms'].iloc)
     ))
 
     fig.update_layout(
