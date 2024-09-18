@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle
 
 from ase.io import read
@@ -8,10 +9,11 @@ from gpaw import FermiDirac, PoissonSolver, Mixer
 from gpaw.utilities import h2gpts
 
 
-def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: float, time_step: float, kpts: tuple[int, int, int] = (1, 1, 1),):
+def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: float, time_step: float, kpts: tuple[int, int, int] = (1, 1, 1), static_pwd: bool = False):
     atoms = read(structure)
 
-    name = structure.split('/')[-1].split('.')[0]
+    sti = os.path.dirname(os.path.realpath(structure)) if not static_pwd else './'
+    name = os.path.basename(structure).split('.')[0]
 
     kpts_dict = dict(kpts=kpts) if mode == 'pw' else dict()
 
@@ -27,7 +29,7 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
         #    convergence={'energy': 2.0e-7, 'density': 1e-5}, # HIGH
         convergence={'energy': 5.0e-6, 'density': 8e-5},  # LOW
         #    parallel = dict(sl_auto = True), #Using Scalapack = 4x speedup!
-        txt=f'{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')+'.txt',
+        txt=f'{sti}/{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '')+'.txt',
         **kpts_dict
     )
 
@@ -35,7 +37,7 @@ def main(structure: str, mode: str, xc: str, temperature: float, brendsen_tau: f
 
     calc_pickle = str(pickle.dumps(calc_par_dict))
 
-    with db.connect(f'{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '') + '.db') as db_obj:
+    with db.connect(f'{sti}/{name}_{xc}_{mode}'+(f'_k{"-".join(map(str, kpts))}' if mode == 'pw' else '') + '.db') as db_obj:
         db_obj.write(atoms=atoms, kinitic_E=0, temperature=temperature, brendsen_tau=brendsen_tau, time=0, time_step_size=time_step, data=dict(calc_pickle=calc_pickle))
 
 
@@ -48,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('XC', type=str)
     parser.add_argument('-k', '--kpts', nargs=3, default=(1, 1, 1), type=int)
     parser.add_argument('-m', '--mode', choices=('fd', 'lcao', 'pw'), default='lcao', type=str)
+    parser.add_argument('--static', action='store_true', help='a bool for choosing a static workdir, files will be made wherever pwd is')
     args = parser.parse_args()
 
     main(
@@ -57,5 +60,6 @@ if __name__ == '__main__':
         temperature=args.temperature,
         brendsen_tau=args.brendsen_tau,
         time_step=args.time_step_size,
-        kpts=args.kpts
+        kpts=args.kpts,
+        static_pwd=args.static
     )
