@@ -16,8 +16,8 @@ from ase.io import read, write
 
 def main(atoms_obj, layer_heights, layer_atom_numbers, vacuum, out):
     if type(atoms_obj) == str:
-        if atoms_obj.split('.')[-1] == '.db': work_atoms = build_pd(atoms_obj).iloc[-1]['atoms']
-        elif atoms_obj.split('.')[-1] == '.traj': work_atoms = read(atoms_obj, -1)
+        if atoms_obj.split('.')[-1] == 'db': work_atoms = build_pd(atoms_obj).iloc[-1]['atoms']
+        elif atoms_obj.split('.')[-1] == 'traj': work_atoms = read(atoms_obj, -1)
         else: raise 'could not find atoms_obj type'
     elif type(atoms_obj) == Atoms: work_atoms = atoms_obj
     else: raise 'could not find atoms_obj type'
