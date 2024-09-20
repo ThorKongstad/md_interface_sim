@@ -101,7 +101,7 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
 def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     fig = go.Figure()
 
-    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
+    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[:index])
     residual_gen = list(map(residual, range(panda_data.shape[0])))
 
     upper_bound = [res_norm[0] + res_norm[1] for res_norm in residual_gen]
@@ -124,7 +124,7 @@ def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     ))
 
     fig.update_layout(
-        yaxis_title=r'$\Phi$',
+        yaxis_title=r'<$\Phi$[:i]>',
         xaxis_title='time',
     )
 
