@@ -24,7 +24,7 @@ def main(atoms_obj, layer_heights, layer_atom_numbers, vacuum, out):
     else: raise 'could not find atoms_obj type'
 
     new_atoms: Atoms = work_atoms[layer_atom_numbers].copy()
-    new_atoms.set_positions((a-b for a, b in zip(new_atoms.get_positions()[0], (0, 0, layer_heights))))
+    new_atoms.set_positions(new_atoms.get_positions() + np.array(tuple((0, 0, -layer_heights) for i in len(new_atoms))))
     work_atoms.append(new_atoms)
 
     work_atoms.set_cell(work_atoms.get_cell() + np.array(((0, 0, 0), (0, 0, 0), (0, 0, vacuum))))
