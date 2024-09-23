@@ -25,7 +25,7 @@ def main(atoms_obj, layer_heights, layer_atom_numbers, vacuum, out):
 
     new_atoms: Atoms = work_atoms[layer_atom_numbers].copy()
     new_atoms.set_positions(new_atoms.get_positions() + np.array(tuple((0, 0, -layer_heights) for i in range(len(new_atoms)))))
-    work_atoms.append(new_atoms)
+    work_atoms.extend(new_atoms)
 
     work_atoms.set_cell(work_atoms.get_cell() + np.array(((0, 0, 0), (0, 0, 0), (0, 0, vacuum))))
     work_atoms.set_positions((pos + np.array((0, 0, vacuum)) for pos in work_atoms.get_positions()))
