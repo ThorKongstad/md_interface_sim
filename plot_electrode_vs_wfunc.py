@@ -41,7 +41,7 @@ class Ion:
 
     def __post_init__(self):
         if self.E is None:
-            E_H2 = -6.635# -6.616893  # RPBE lcao calculation with Cu ghost
+            E_H2 = (-6.644 if not amanda_test() else -6.616893)# RPBE lcao calculation with Cu ghost
             E_H2O = -13.528367  # RPBE lcao calculation with Cu ghost
             G_H2 = E_H2-(-0.49)
             match self.name:
@@ -130,11 +130,15 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     reference_mean = (dat_pd[sim_names[0]]['energy']
                     + dat_pd[sim_names[0]]['kinitic_E' if not amanda_test() else 'Ekin']).mean()
 
+    if amanda_test(): proton_pot = -6.616893-(-0.49)
+    elif '_pw_' in dbs_dirs[0].lower(): proton_pot = -6.56-(-0.49)
+    else: proton_pot = -6.644-(-0.49)
+
     ghe = lambda pd_series: generalised_hydrogen_electrode(
         E=pd_series['energy'] + pd_series['kinitic_E' if not amanda_test() else 'Ekin'],
         E_ref=reference_mean,
         n_proton=get_H_count(pd_series.get('atoms')),
-        proton_pot= (-6.644-(-0.49) if not amanda_test() else -6.616893-(-0.49)), #ss
+        proton_pot=proton_pot,
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
         pH=ph,
