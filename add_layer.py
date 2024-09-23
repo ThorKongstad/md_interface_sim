@@ -32,7 +32,7 @@ def main(atoms_obj, layer_heights, layer_atom_numbers, vacuum, out):
     work_atoms.set_positions(work_atoms.get_positions() + np.array(tuple((0, 0, vacuum) for i in range(len(work_atoms)))), apply_constraint=False)
 
     work_atoms.set_constraint((work_atoms.constraints if isinstance(work_atoms.constraints, list) else [work_atoms.constraints])
-                              + FixAtoms(indices=list(range(len(work_atoms)-len(layer_atom_numbers), len(work_atoms)))))
+                              + [FixAtoms(indices=list(range(len(work_atoms)-len(layer_atom_numbers), len(work_atoms))))])
 
     write(out, work_atoms)
 
