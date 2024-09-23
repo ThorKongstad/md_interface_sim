@@ -10,7 +10,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import build_pd, folder_exist
 
 import numpy as np
-from ase import Atoms, Atom
+from ase import Atoms
 from ase.io import read, write
 
 
@@ -23,10 +23,9 @@ def main(atoms_obj, layer_heights, layer_atom_numbers, vacuum, out):
     elif type(atoms_obj) == Atoms: work_atoms = atoms_obj
     else: raise 'could not find atoms_obj type'
 
-    for at_nr in layer_atom_numbers:
-        new_atom: Atom = deepcopy(work_atoms[at_nr])
-        new_atom.position = (a-b for a, b in zip(new_atom.position, (0, 0, layer_heights)))
-        work_atoms.append(new_atom)
+    new_atoms: Atoms = work_atoms[layer_atom_numbers].copy()
+    new_atoms.set_positions((a-b for a, b in zip(new_atoms.get_positions()[0], (0, 0, layer_heights))))
+    work_atoms.append(new_atoms)
 
     work_atoms.set_cell(work_atoms.get_cell() + np.array(((0, 0, 0), (0, 0, 0), (0, 0, vacuum))))
     work_atoms.set_positions((pos + np.array((0, 0, vacuum)) for pos in work_atoms.get_positions()))
