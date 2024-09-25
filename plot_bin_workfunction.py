@@ -16,7 +16,7 @@ from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 from numpy import histogram_bin_edges
-from scipy.stats import norm
+from scipy.stats import norm, goodness_of_fit
 
 
 def amanda_test() -> bool:
@@ -146,6 +146,30 @@ def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     return fig
 
 
+def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
+    fig = go.Figure()
+
+    fit_test_forward = lambda index: goodness_of_fit(
+        dist=norm,
+        data=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:],
+        statistic='ks'
+    )
+    fit_test_forward_gen = list(map(fit_test_forward, range(panda_data.shape[0])))
+
+    fig.add_trace(go.Scatter(
+        mode='lines',
+        y=[fit_test.statistic for fit_test in fit_test_forward_gen],
+        x=panda_data['id'],
+    ))
+
+    fig.update_layout(
+        yaxis_title=r'ks stats norm(<$\Phi$[:i]>)',
+        xaxis_title='id no.',
+    )
+
+    return fig
+
+
 def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     bin_edges = histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].dropna(), bins='fd')
     binsize = bin_edges[1] - bin_edges[0]
@@ -186,6 +210,16 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
                             [{"colspan": 2}, None]],
                      row_heights=[0.5, 0.25, 0.25])
 
+    #fig.add_traces(data=(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, rows=1, cols=2)
+    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
+    #fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
+    #fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
+
+    fig.add_traces(data=(fit_plot := plot_fit_goodness(panda_data)).data, rows=1, cols=2)
+    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
+    fig.update_xaxes(title_text=fit_plot.layout.xaxis.title.text, row=1, col=2)
+    fig.update_yaxes(title_text=fit_plot.layout.yaxis.title.text, row=1, col=2)
+
     fig.add_traces(data=(T_plot := plot_temperature(panda_data)).data, rows=2, cols=1)
     #fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
     fig.update_xaxes(title_text=T_plot.layout.xaxis.title.text, row=2, col=1)
@@ -195,11 +229,6 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     #fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
     #fig.update_xaxes(title_text=hist3d_plot.layout.xaxis.title.text, row=1, col=2)
     #fig.update_yaxes(title_text=hist3d_plot.layout.yaxis.title.text, row=1, col=2)
-
-    fig.add_traces(data=(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, rows=1, cols=2)
-    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
-    fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
-    fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
 
     fig.add_traces(data=(residual_plot := plot_residual_energy(panda_data)).data, rows=3, cols=1)
     fig.update_xaxes(title_text=residual_plot.layout.xaxis.title.text, row=3, col=1)
