@@ -176,7 +176,7 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
     #               ]
 
     forward_normtest = lambda index: normaltest(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
-    forward_normtest_gen = map(forward_normtest, range(panda_data.shape[0]))
+    forward_normtest_gen = map(forward_normtest, range(panda_data.shape[0]-10))
 
     fig.add_trace(go.Scatter(
         mode='lines',
