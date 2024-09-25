@@ -171,7 +171,7 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
     forward_fits_gen = map(forward_fits, range(panda_data.shape[0]))
     forward_hist_gen = map(forward_histo, range(panda_data.shape[0]))
 
-    chi_results = [chisquare(np.array(val/hist[0].sum() for val in hist[0]), fit.pdf(bin_middles(hist[1])))
+    chi_results = [chisquare(np.array(list(val/hist[0].sum() for val in hist[0])), fit.pdf(bin_middles(hist[1])))
                    for fit, hist in zip(forward_fits_gen, forward_hist_gen)
                    ]
 
