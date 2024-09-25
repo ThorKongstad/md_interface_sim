@@ -162,7 +162,7 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
 #       x=panda_data['id'],
 #    ))
 
-    forward_fits = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
+    forward_fits = lambda index: norm(*norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:]))
     forward_histo = lambda index: np.histogram(
         a=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna(),
         bins=histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna(), bins='fd')
