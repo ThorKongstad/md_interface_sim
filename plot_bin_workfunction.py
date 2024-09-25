@@ -16,7 +16,7 @@ from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 from numpy import histogram_bin_edges
-from scipy.stats import norm, goodness_of_fit
+from scipy.stats import norm, goodness_of_fit, chisquare
 
 
 def amanda_test() -> bool:
@@ -149,21 +149,39 @@ def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
 def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
     fig = go.Figure()
 
-    fit_test_forward = lambda index: goodness_of_fit(
-        dist=norm,
-        data=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:],
-        statistic='ks'
+#    fit_test_forward = lambda index: goodness_of_fit(
+#        dist=norm,
+#        data=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:],
+#        statistic='ks'
+#    )
+#   fit_test_forward_gen = list(map(fit_test_forward, range(panda_data.shape[0]-1)))
+
+#    fig.add_trace(go.Scatter(
+#        mode='lines',
+#        y=[fit_test.statistic for fit_test in fit_test_forward_gen],
+#       x=panda_data['id'],
+#    ))
+
+    forward_fits = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
+    forward_histo = lambda index: np.histogram(
+        a=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna(),
+        bins=histogram_bin_edges(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna(), bins='fd')
     )
-    fit_test_forward_gen = list(map(fit_test_forward, range(panda_data.shape[0]-1)))
+    forward_fits_gen = map(forward_fits, range(panda_data.shape[0]))
+    forward_hist_gen = map(forward_histo, range(panda_data.shape[0]))
+
+    chi_results = [chisquare(hist.hist, fit.pdf(bin_middles(hist.bin_edges)))
+                   for fit, hist in zip(forward_fits_gen, forward_hist_gen)
+                   ]
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=[fit_test.statistic for fit_test in fit_test_forward_gen],
+        y=[chi.pvalue for chi in chi_results],
         x=panda_data['id'],
     ))
 
     fig.update_layout(
-        yaxis_title=r'ks stats norm(<$\Phi$[:i]>)',
+        yaxis_title=r'chi-square norm(<$\Phi$[:i]>)',
         xaxis_title='id no.',
     )
 
@@ -237,6 +255,11 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
     folder_exist('plots')
     fig.write_html('plots/' + save_name + '.html', include_mathjax='cdn')
     if png: fig.write_image('plots/' + save_name + '.png')
+
+
+def bin_middles(bin_edges: Sequence[float]) -> Sequence[float]:
+    bin_size = bin_edges[1] - bin_edges[0]
+    return [bin_start - bin_size/2 for bin_start in bin_edges][:-1]
 
 
 def main(md_db: str, png: bool):
