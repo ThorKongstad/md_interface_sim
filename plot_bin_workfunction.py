@@ -101,31 +101,46 @@ def plot_3d_hist(panda_data: DataFrame,) -> go.Figure:
 def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
     fig = go.Figure()
 
-    residual = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[:index])
-    residual_gen = list(map(residual, range(panda_data.shape[0])))
+    residual_back = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[:index])
+    residual_forward = lambda index: norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
+    residual_back_gen = list(map(residual_back, range(panda_data.shape[0])))
+    residual_forward_gen = list(map(residual_forward, range(panda_data.shape[0])))
 
-    upper_bound = [res_norm[0] + res_norm[1] for res_norm in residual_gen]
-    lower_bound = [res_norm[0] - res_norm[1] for res_norm in residual_gen]
+    upper_bound_back = [res_norm[0] + res_norm[1] for res_norm in residual_back_gen]
+    lower_bound_back = [res_norm[0] - res_norm[1] for res_norm in residual_back_gen]
+
+    upper_bound_forward = [res_norm[0] + res_norm[1] for res_norm in residual_forward_gen]
+    lower_bound_forward = [res_norm[0] - res_norm[1] for res_norm in residual_forward_gen]
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y= [res_norm[0] for res_norm in residual_gen],
-        x=panda_data['time' if not amanda_test() else 'id'],
+        y=[res_norm[0] for res_norm in residual_back_gen],
+        x=panda_data['id'],
     ))
 
     fig.add_trace(go.Scatter(
         #mode='lines',
-        x=panda_data['time' if not amanda_test() else 'id'].to_list() + panda_data['time' if not amanda_test() else 'id'].iloc[::-1].to_list(),
-        y=upper_bound + list(reversed(lower_bound)),
+        x=panda_data['id'].to_list() + panda_data['id'].iloc[::-1].to_list(),
+        y=upper_bound_back + list(reversed(lower_bound_back)),
         hoverinfo="skip",
         showlegend=False,
         fill='toself',
-        fillcolor='rgba(0,100,80,0.2)',
+        fillcolor='rgba(101,118,164,0.2)'#'rgba(0,100,80,0.2)',
+    ))
+
+    fig.add_trace(go.Scatter(
+        #mode='lines',
+        x=panda_data['id'].to_list() + panda_data['id'].iloc[::-1].to_list(),
+        y=upper_bound_forward + list(reversed(lower_bound_forward)),
+        hoverinfo="skip",
+        showlegend=False,
+        fill='toself',
+        fillcolor='rgba(214,83,31,0.2)',
     ))
 
     fig.update_layout(
         yaxis_title=r'<$\Phi$[:i]>',
-        xaxis_title='time',
+        xaxis_title='id no.',
     )
 
     return fig
