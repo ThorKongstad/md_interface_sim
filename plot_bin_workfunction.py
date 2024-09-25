@@ -154,7 +154,7 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
         data=panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:],
         statistic='ks'
     )
-    fit_test_forward_gen = list(map(fit_test_forward, range(panda_data.shape[0])))
+    fit_test_forward_gen = list(map(fit_test_forward, range(panda_data.shape[0]-1)))
 
     fig.add_trace(go.Scatter(
         mode='lines',
