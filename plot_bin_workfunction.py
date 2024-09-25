@@ -16,7 +16,7 @@ from pandas import DataFrame
 import ase.db as db
 import plotly.graph_objects as go
 from numpy import histogram_bin_edges
-from scipy.stats import norm, goodness_of_fit, chisquare
+from scipy.stats import norm, goodness_of_fit, chisquare, normaltest
 
 
 def amanda_test() -> bool:
@@ -162,22 +162,25 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
 #       x=panda_data['id'],
 #    ))
 
-    forward_fits = lambda index: norm(*norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:]))
-    forward_histo = lambda index: np.histogram(
-        a=(dat := panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna()),
-        bins=histogram_bin_edges(dat, bins='fd'),
-        density=True
-    )
-    forward_fits_gen = map(forward_fits, range(panda_data.shape[0]))
-    forward_hist_gen = map(forward_histo, range(panda_data.shape[0]))
+#    forward_fits = lambda index: norm(*norm.fit(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:]))
+#    forward_histo = lambda index: np.histogram(
+#        a=(dat := panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:].dropna()),
+#        bins=histogram_bin_edges(dat, bins='fd'),
+#        density=True
+#    )
+#    forward_fits_gen = map(forward_fits, range(panda_data.shape[0]))
+#    forward_hist_gen = map(forward_histo, range(panda_data.shape[0]))
 
-    chi_results = [chisquare(np.array(list(val/hist[0].sum() for val in hist[0])), (fit_dat := np.array(fit.pdf(bin_middles(hist[1]))))/sum(fit_dat))
-                   for fit, hist in zip(forward_fits_gen, forward_hist_gen)
-                   ]
+    #chi_results = [chisquare(np.array(list(val/hist[0].sum() for val in hist[0])), (fit_dat := np.array(fit.pdf(bin_middles(hist[1]))))/sum(fit_dat))
+    #               for fit, hist in zip(forward_fits_gen, forward_hist_gen)
+    #               ]
+
+    forward_normtest = lambda index: normaltest(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
+    forward_normtest_gen = map(forward_normtest, range(panda_data.shape[0]))
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=[chi.pvalue for chi in chi_results],
+        y=[chi[1] for chi in tuple(forward_normtest_gen)],
         x=panda_data['id'],
     ))
 
