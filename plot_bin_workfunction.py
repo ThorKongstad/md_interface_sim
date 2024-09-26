@@ -114,7 +114,7 @@ def plot_Wfunc_deviation(panda_data: DataFrame,) -> go.Figure:
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=[res_norm[0] for res_norm in residual_back_gen],
+        y=tuple(map(itemgetter(0), residual_back_gen)),#[res_norm[0] for res_norm in residual_back_gen],
         x=panda_data['id'],
     ))
 
@@ -180,7 +180,7 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=map(itemgetter(0), forward_normtest_gen), #[chi[1] for chi in tuple(forward_normtest_gen)],
+        y=tuple(map(itemgetter(0), forward_normtest_gen)), #[chi[1] for chi in tuple(forward_normtest_gen)],
         x=panda_data['id'],
     ))
 
@@ -232,15 +232,13 @@ def plot_bins_work_func(panda_data: DataFrame, save_name: str, png: bool):
                             [{"colspan": 2}, None]],
                      row_heights=[0.5, 0.25, 0.25])
 
-    #fig.add_traces(data=(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, rows=1, cols=2)
-    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
-    #fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
-    #fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
+    fig.add_traces(data=(Wfunc_plot := plot_Wfunc_deviation(panda_data)).data, rows=1, cols=2)
+    fig.update_xaxes(title_text=Wfunc_plot.layout.xaxis.title.text, row=1, col=2)
+    fig.update_yaxes(title_text=Wfunc_plot.layout.yaxis.title.text, row=1, col=2)
 
-    fig.add_traces(data=(fit_plot := plot_fit_goodness(panda_data)).data, rows=1, cols=2)
-    # fig.update_layout(hist3d_plot.to_dict()['layout'], row=1, col=2)
-    fig.update_xaxes(title_text=fit_plot.layout.xaxis.title.text, row=1, col=2)
-    fig.update_yaxes(title_text=fit_plot.layout.yaxis.title.text, row=1, col=2)
+    #fig.add_traces(data=(fit_plot := plot_fit_goodness(panda_data)).data, rows=1, cols=2)
+    #fig.update_xaxes(title_text=fit_plot.layout.xaxis.title.text, row=1, col=2)
+    #fig.update_yaxes(title_text=fit_plot.layout.yaxis.title.text, row=1, col=2)
 
     fig.add_traces(data=(T_plot := plot_temperature(panda_data)).data, rows=2, cols=1)
     #fig.update_layout(T_plot.to_dict()['layout'], row=2, col=1)
