@@ -5,7 +5,7 @@ import time
 import sys
 import pathlib
 from subprocess import call
-#from operator import itemgetter
+from operator import itemgetter
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from md_interface_sim import build_pd, folder_exist
@@ -176,16 +176,16 @@ def plot_fit_goodness(panda_data: DataFrame,) -> go.Figure:
     #               ]
 
     forward_normtest = lambda index: normaltest(panda_data['work_top' if not amanda_test() else 'wftop'].iloc[index:])
-    forward_normtest_gen = map(forward_normtest, range(panda_data.shape[0]-10))
+    forward_normtest_gen = map(forward_normtest, range(panda_data.shape[0]-20))
 
     fig.add_trace(go.Scatter(
         mode='lines',
-        y=[chi[1] for chi in tuple(forward_normtest_gen)],
+        y=map(itemgetter(0), forward_normtest_gen), #[chi[1] for chi in tuple(forward_normtest_gen)],
         x=panda_data['id'],
     ))
 
     fig.update_layout(
-        yaxis_title=r'chi-square norm(<$\Phi$[:i]>)',
+        yaxis_title=r'chi-square norm(<Phi[:i]>)',
         xaxis_title='id no.',
     )
 
