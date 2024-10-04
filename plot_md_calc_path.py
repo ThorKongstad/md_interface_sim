@@ -37,9 +37,10 @@ def main(db_dir: str):
         data_frame=md_panda,
         x='work_top',
         y='time',
+        markers=True
     )
 
-    fig.update_layout(xaxis_title='Z', yaxis_title='work function')
+    fig.update_layout(xaxis_title='Work function', yaxis_title='md time')
 
     folder_exist(f'misc_plots')
     save_name = f'misc_plots/' + os.path.basename(db_dir).split('.')[0] + '_path' #f'workfunc_plots_{calculation_name}/time_{time_step}'
@@ -52,3 +53,4 @@ if __name__ == '__main__':
 #    parser.add_argument('row_index', type=int)
     args = parser.parse_args()
 
+    main(db_dir=args.db)
