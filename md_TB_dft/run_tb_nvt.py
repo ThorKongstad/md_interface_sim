@@ -150,5 +150,5 @@ if __name__ =='__main__':
     args = parser.parse_args()
 
 
-    main(args.db_structure, args.calc_n_steps, args.until, args.dft_steps)
+    main(args.db_structure, args.calc_n_steps, args.until, args.dft_step)
 
