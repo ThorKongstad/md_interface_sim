@@ -57,7 +57,7 @@ def db_tb_observer(atoms: Atoms, database_dir: str, temperature: float, brendsen
         global cur_time
         cur_time += time_step_size
     else: cur_time = current_time
-    db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, time_step_size=time_step_size, data=dict(tb_calc_pickle=(str(tb_calc_par_pickle) if tb_calc_par_pickle else str(pickle.dumps(atoms.calc.parameters))), xc_calc_pickle=str(xc_calc_par_pickle)))
+    db_obj.write(atoms=atoms, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, time_step_size=time_step_size, data=dict(tb_calc_pickle=(str(tb_calc_par_pickle) if tb_calc_par_pickle else str(pickle.dumps(atoms.calc.parameters))), xc_calc_pickle=str(xc_calc_par_pickle)))
 
 
 def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
