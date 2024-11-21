@@ -133,7 +133,7 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
         dyn.attach(start_dft,
                    interval=dft_interval,
                    submission_script=submission_script,
-                   dft_script=os.path.dirname(__file__) + 'run_dft_sp.py',
+                   dft_script=os.path.dirname(__file__) + '/run_dft_sp.py',
                    db_tb=md_db,
                    )
 
