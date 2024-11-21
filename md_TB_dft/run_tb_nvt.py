@@ -105,7 +105,7 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
         row = db_obj.get(selection=f'id={len(db_obj)}')
         atoms: Atoms = row.toatoms()
         tb_calc_pickle = eval(row.data.get('tb_calc_pickle'))
-#        xc_calc_pickle = eval(row.data.get('xc_calc_pickle'))
+        xc_calc_pickle = eval(row.data.get('xc_calc_pickle'))
         atoms.set_calculator(TBLite(**pickle.loads(tb_calc_pickle)))
 
         #start_time = row.get('time')
@@ -125,6 +125,7 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
                temperature=temperature,
                brendsen_tau=brendsen_tau,
                time_step_size=time_step,
+               xc_calc_par_pickle=xc_calc_pickle,
                tb_calc_par_pickle=tb_calc_pickle,
                )
 
