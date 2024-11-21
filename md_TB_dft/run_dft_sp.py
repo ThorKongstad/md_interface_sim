@@ -102,7 +102,7 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
 if __name__ =='__main__':
     parser =argparse.ArgumentParser()
     parser.add_argument('db_structure', type=str)
-    parser.add_argument('time', type=int)
+    parser.add_argument('time', type=float)
     parser.add_argument('--db_out', type=str)
 
 #    parser.add_argument('calc_n_steps', type=int)
