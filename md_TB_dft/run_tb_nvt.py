@@ -94,8 +94,9 @@ def plot_work_functions(atoms: Atoms, calculation_name: str, time_step: float):
 
 
 def start_dft(submission_script: str, dft_script: str, db_tb: str):
-    current_time = globals().get('cur_time')
-    call([submission_script, dft_script, db_tb, str(current_time)])
+    if world.rank == 0:
+        current_time = globals().get('cur_time')
+        call([submission_script, dft_script, db_tb, str(current_time)])
 
 
 def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = False, submission_script: str = '/lustre/hpc/kemi/thorkong/katla_submission/submit_katla_GP241_static'):
