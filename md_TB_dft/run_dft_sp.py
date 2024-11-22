@@ -91,7 +91,7 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
     work_function_bot = mean_elec_pot_z[4] - fermi_E
 
     if out_db is None:
-        sti = os.path.dirname(md_db)
+        sti = os.path.dirname(os.path.realpath(md_db))
         name = os.path.basename(md_db).split('-' + tb_calc_par['method'])[0]
         out_db = f'{sti}/{name}_{xc_calc_par["xc"]}_{xc_calc_par["mode"]}'+(f'_k{"-".join(map(str, xc_calc_par["kpts"]))}' if xc_calc_par["mode"] == 'pw' else '') + '.db'
 
