@@ -96,7 +96,7 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
         out_db = f'{sti}/{name}_{xc_calc_par["xc"]}_{xc_calc_par["mode"]}'+(f'_k{"-".join(map(str, xc_calc_par["kpts"]))}' if xc_calc_par["mode"] == 'pw' else '') + '.db'
 
     with db.connect(out_db) as db_obj:
-        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, data=dict(xc_calc_pickle=xc_calc_pickle))
+        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, data=dict(xc_calc_pickle=str(xc_calc_pickle)))
 
 
 if __name__ =='__main__':
