@@ -102,8 +102,7 @@ def start_dft(submission_script: str, dft_script: str, db_tb: str):
 def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = False, submission_script: str = '/lustre/hpc/kemi/thorkong/katla_submission/submit_katla_GP241_static'):
     if not os.path.basename(md_db) in os.listdir(db_path if len(db_path := os.path.dirname(md_db)) > 0 else '.'): raise FileNotFoundError("Can't find database")
     with db.connect(md_db) as db_obj:
-        db_size = len(db_obj)
-        row = db_obj.get(selection=f'id={len(db_obj)}')
+        row = max(db_obj.select(), key=lambda row: row.get('time'))
         atoms: Atoms = row.toatoms()
         tb_calc_pickle = eval(row.data.get('tb_calc_pickle'))
         xc_calc_pickle = eval(row.data.get('xc_calc_pickle'))
@@ -112,7 +111,7 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
         #start_time = row.get('time')
         time_step = row.get('time_step_size')
         global cur_time
-        cur_time = db_obj.get(selection=f'id={len(db_obj)}').get('time')
+        cur_time = row.get('time')
 
  #       free_atoms = len(atoms) - sum([len(con.index) for con in atoms.constraints]) # this will only work in newer version of ase and older fixatoms in older version, since indicies are called a in some places
 
@@ -138,7 +137,7 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
                    db_tb=md_db,
                    )
 
-    dyn.run(n_steps if not run_until else n_steps - db_size)
+    dyn.run(n_steps if not run_until else n_steps - cur_time/time_step)
 
 
 if __name__ =='__main__':
