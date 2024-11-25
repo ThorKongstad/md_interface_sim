@@ -26,3 +26,10 @@ def folder_exist(folder_name: str, path: str = '.') -> None:
 
 def ends_with(string: str, end_str: str) -> str:
     return string + end_str * (end_str != string[-len(end_str):0])
+
+
+def sanitize(unclean_str: str) -> str:
+    for ch in ['!', '*', '?', '{', '[', '(', ')', ']', '}', "'", '"']: unclean_str = unclean_str.replace(ch, '')
+    for ch in ['/', '\\', '|', ' ', ',', '.']: unclean_str = unclean_str.replace(ch, '_')
+    for ch in ['=', '+', ':', ';']: unclean_str = unclean_str.replace(ch, '-')
+    return unclean_str
