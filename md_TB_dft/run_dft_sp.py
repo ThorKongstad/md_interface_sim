@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_random
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent.parent))
-from md_interface_sim import folder_exist
+from md_interface_sim import folder_exist, sanitize
 
 import numpy as np
 
@@ -73,12 +73,16 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
         atoms: Atoms = row.toatoms()
         xc_calc_pickle = eval(row.data.get('xc_calc_pickle'))
         tb_calc_pickle = eval(row.data.get('tb_calc_pickle'))
-
+        time = row.get('time')
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
 
     xc_calc_par: dict = pickle.loads(xc_calc_pickle)
     tb_calc_par: dict = pickle.loads(tb_calc_pickle)
+
+    xc_calc_par['txt'] = xc_calc_par['txt'].replace('.txt', f'_T{time}.txt')
+    xc_calc_par['txt'] = os.path.join(os.path.join(os.path.dirname(xc_calc_par['txt']), sanitize(str(xc_calc_par["xc"]))), os.path.basename(xc_calc_par['txt']))
+    folder_exist(os.path.basename(xc_calc_par['txt']))
 
     atoms.set_calculator(GPAW(**xc_calc_par))
 
