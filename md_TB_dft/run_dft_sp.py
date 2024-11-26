@@ -82,9 +82,9 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
 
     xc_calc_par['txt'] = xc_calc_par['txt'].replace('.txt', f'_T{time}.txt')
     xc_calc_par['txt'] = os.path.join(os.path.join(os.path.dirname(xc_calc_par['txt']), sanitize(str(xc_calc_par["xc"]))), os.path.basename(xc_calc_par['txt']))
-    folder_exist(os.path.basename(xc_calc_par['txt']))
+    folder_exist(os.path.dirname(xc_calc_par['txt']))
 
-    atoms.set_calculator(GPAW(**xc_calc_par))
+    atoms.calc = GPAW(**xc_calc_par)
 
     atoms.get_potential_energy()
     atoms.get_forces()
