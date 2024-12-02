@@ -95,8 +95,8 @@ def make_trace(name, db: pd.DataFrame, ghe_lambda: Callable[[pd.Series], float],
     )
 
 
-def get_H_count(atoms: ase.Atoms,) -> int:
-    return atoms.get_chemical_formula(mode='all').count('H') - 64
+def get_H_count(atoms: ase.Atoms, surfH: int = 0) -> int:
+    return atoms.get_chemical_formula(mode='all').count('H') - 64 - surfH
 
 
 def get_ion_count(atoms: ase.Atoms):
@@ -119,7 +119,7 @@ def sp(x):
     return x
 
 
-def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] = None, ph: float = 6, png: bool = False, Hcolor_bool: bool = False):
+def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] = None, ph: float = 6, png: bool = False, Hcolor_bool: bool = False, surfH: int = 0):
     dbs_dirs, dbs_selection = list(zip(*(db_dir.split('@') if '@' in db_dir else [db_dir, None] for db_dir in dbs_dirs)))
     for db_dir in dbs_dirs:
         if not os.path.basename(db_dir) in os.listdir(db_path if len(db_path := os.path.dirname(db_dir)) > 0 else '.'): raise FileNotFoundError("Can't find database")
@@ -137,7 +137,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     ghe = lambda pd_series: generalised_hydrogen_electrode(
         E=pd_series['energy'] + pd_series['kinitic_E' if not amanda_test() else 'Ekin'],
         E_ref=reference_mean,
-        n_proton=get_H_count(pd_series.get('atoms')),
+        n_proton=get_H_count(pd_series.get('atoms'), surfH),
         proton_pot=proton_pot,
         cat_list=get_ion_count(pd_series.get('atoms')),
         work_func=pd_series['work_top' if not amanda_test() else 'wftop'],
@@ -146,7 +146,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
     )
 
     if Hcolor_bool:
-        proton_counts = [get_H_count(db.iloc[0].get('atoms')) for db in dat_pd.values()]
+        proton_counts = [get_H_count(db.iloc[0].get('atoms'), surfH) for db in dat_pd.values()]
         max_pro_devi = max(proton_counts, key=abs)
 
     fig = go.Figure()
@@ -155,7 +155,7 @@ def main(dbs_dirs: Sequence[str], save_name, sim_names: Optional[Sequence[str]] 
             name=key,
             db=val,
             ghe_lambda=ghe,
-            Hcolor_fraction=((0.5 + (get_H_count(val.iloc[0].get('atoms'))/max_pro_devi) * 0.5) if Hcolor_bool else None),
+            Hcolor_fraction=((0.5 + (get_H_count(val.iloc[0].get('atoms'), surfH)/max_pro_devi) * 0.5) if Hcolor_bool else None),
         ))
 
     fig.update_layout(
@@ -198,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--from_amanda', action='store_true')
     parser.add_argument('--png', action='store_true')
     parser.add_argument('--Hcolour', action='store_true', help='bool for colouring after no. of H')
+    parser.add_argument('-surfH', '--surface_hydrogens', type=int, help='count of the hydrogens in the surface.', default=0)
     args = parser.parse_args()
 
     global from_amanda
@@ -208,4 +209,5 @@ if __name__ == '__main__':
          sim_names=args.sim_names,
          ph=args.pH,
          png=args.png,
-         Hcolor_bool=args.Hcolour)
+         Hcolor_bool=args.Hcolour,
+         surfH=args.surface_hydrogens)
