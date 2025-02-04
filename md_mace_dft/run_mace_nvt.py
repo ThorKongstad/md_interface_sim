@@ -114,6 +114,9 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
 
+    #not good/safe solution but the that is suggested
+    os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
+
     random = np.random.default_rng(42)
     dyn = Bussi(atoms, time_step * units.fs, temperature, brendsen_tau * units.fs, rng=random)
     dyn.attach(db_mace_observer,
