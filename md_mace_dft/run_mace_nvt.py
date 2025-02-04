@@ -15,7 +15,8 @@ import numpy as np
 
 import ase.db as db
 from ase import Atoms
-from ase.md.nvtberendsen import NVTBerendsen
+#from ase.md.nvtberendsen import NVTBerendsen
+from ase.md.bussi import Bussi
 from ase import units
 from ase.parallel import world, barrier, broadcast
 
@@ -113,7 +114,8 @@ def main(md_db: str, n_steps: int, run_until: bool = False, dft_interval: int = 
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
 
-    dyn = NVTBerendsen(atoms, time_step * units.fs, temperature, brendsen_tau * units.fs, True)
+    random = np.random.default_rng(42)
+    dyn = Bussi(atoms, time_step * units.fs, temperature, brendsen_tau * units.fs, rng=random)
     dyn.attach(db_mace_observer,
                atoms=atoms,
                database_dir=md_db,
