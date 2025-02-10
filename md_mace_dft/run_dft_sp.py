@@ -1,4 +1,4 @@
-#partition=katla
+#partition=katla_medium
 #nprocshared=32
 #mem=2000MB
 #constrain='[v4|v5]'
@@ -72,13 +72,13 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
         row = db_obj.get(selection=f'time={cur_time}')
         atoms: Atoms = row.toatoms()
         xc_calc_pickle = eval(row.data.get('xc_calc_pickle'))
-        tb_calc_pickle = eval(row.data.get('tb_calc_pickle'))
+        mace_calc_pickle = eval(row.data.get('mace_calc_pickle'))
         time = row.get('time')
         temperature = row.get('temperature')
         brendsen_tau = row.get('brendsen_tau')
 
     xc_calc_par: dict = pickle.loads(xc_calc_pickle)
-    tb_calc_par: dict = pickle.loads(tb_calc_pickle)
+    mace_calc_par: dict = pickle.loads(mace_calc_pickle)
 
     xc_calc_par['txt'] = xc_calc_par['txt'].replace('.txt', f'_T{time}.txt')
     xc_calc_par['txt'] = os.path.join(os.path.join(os.path.dirname(xc_calc_par['txt']), sanitize(str(xc_calc_par["xc"]))), os.path.basename(xc_calc_par['txt']))
@@ -96,11 +96,11 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
 
     if out_db is None:
         sti = os.path.dirname(os.path.realpath(md_db))
-        name = os.path.basename(md_db).split('-' + tb_calc_par['method'])[0]
+        name = os.path.basename(md_db).split('-' + os.path.basename(mace_calc_par['mace_model']).split()[0])[0]
         out_db = f'{sti}/{name}_{xc_calc_par["xc"]}_{xc_calc_par["mode"]}'+(f'_k{"-".join(map(str, xc_calc_par["kpts"]))}' if xc_calc_par["mode"] == 'pw' else '') + '.db'
 
     with db.connect(out_db) as db_obj:
-        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, data=dict(xc_calc_pickle=str(xc_calc_pickle)))
+        db_obj.write(atoms=atoms, kinitic_E=atoms.get_kinetic_energy(), fermi_E=fermi_E, work_top=work_function_top, work_bot=work_function_bot, temperature=temperature, brendsen_tau=brendsen_tau, time=cur_time, data=dict(xc_calc_pickle=str(xc_calc_pickle), mace_calc_pickle=mace_calc_pickle))
 
 
 if __name__ =='__main__':
