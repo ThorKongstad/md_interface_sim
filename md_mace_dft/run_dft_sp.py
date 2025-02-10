@@ -96,7 +96,7 @@ def main(md_db: str, cur_time: int, out_db: Optional[str] = None):
 
     if out_db is None:
         sti = os.path.dirname(os.path.realpath(md_db))
-        name = os.path.basename(md_db).split('-' + os.path.basename(mace_calc_par['mace_model']).split()[0])[0]
+        name = os.path.basename(md_db).split('-' + os.path.basename(mace_calc_par['model_path']).split()[0])[0]
         out_db = f'{sti}/{name}_{xc_calc_par["xc"]}_{xc_calc_par["mode"]}'+(f'_k{"-".join(map(str, xc_calc_par["kpts"]))}' if xc_calc_par["mode"] == 'pw' else '') + '.db'
 
     with db.connect(out_db) as db_obj:
